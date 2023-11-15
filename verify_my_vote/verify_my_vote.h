@@ -29,6 +29,8 @@
 #define BUFFER_SIZE 512
 /// @def Define a maximum length for the buffer that will treat the data.
 
+/*-----------------------------------------------------------------*/
+
 /**
  * @mainpage Vote Verifier Project
  *

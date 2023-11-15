@@ -61,10 +61,20 @@ verify_my_vote/bin/
 verify_my_vote/doc/
 verify_my_vote/*.zip
 
-# Ignore VS Code configuration
+# Ignore configuration
 .vscode/
 verify_my_vote/.vscode/
+.clangd
 
 # Ignore macOS system files
 .DS_Store
 verify_my_vote/.DS_Store
+
+# Ignore CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json
+build/
+.cache/

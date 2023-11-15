@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c99 -D_POSIX_C_SOURCE=200809L
+CFLAGS = -std=c18 -D_POSIX_C_SOURCE=200809L
 DEBUG_FLAGS = -g -O0 -DDEBUG -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-omit-frame-pointer -W -Wall -Wextra -Werror -Wfatal-errors -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -rdynamic
 OBJ_DIR = obj
 BIN_DIR = bin
@@ -44,8 +44,9 @@ deliver:
 	@echo "\033[1;32mDelivery zip created successfully!\033[0m"
 
 clean:
-	@echo "\033[1;31mCleaning up object files, executables, and documentation...\033[0m"
+	@echo "\033[1;31mCleaning up object files, executables, documentation, and zip files...\033[0m"
 	@rm -rf $(OBJ_DIR) $(BIN_DIR) doc deliver
+	@rm -f *.zip
 	@echo "\033[1;31mCleanup complete!\033[0m"
 
 .PHONY: all debug doc deliver clean
