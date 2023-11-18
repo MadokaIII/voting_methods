@@ -1,0 +1,17 @@
+CompileFlags:
+  Add: 
+    - '-xc'
+    - '-std=c18'
+    - '-D_POSIX_C_SOURCE=200809L'
+    - '-Wall'
+    - '-Wextra'
+    - '-Werror'
+    - '-Wuninitialized'
+    - '-Wshadow'
+    - '-Wstrict-overflow'
+    - '-Wconversion'
+    - '-Wnull-dereference'
+    - '-Wdouble-promotion'
+    - '-Wformat=4'
+    - '-Isrc/utils'
+    - '-Isrc/data-structures'

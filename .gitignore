@@ -64,7 +64,6 @@ verify_my_vote/*.zip
 # Ignore configuration
 .vscode/
 verify_my_vote/.vscode/
-.clangd
 
 # Ignore macOS system files
 .DS_Store
