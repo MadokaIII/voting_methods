@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(VotingMethods C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_FLAGS "-D_POSIX_C_SOURCE=200809L")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Add subdirectories
 add_subdirectory(src/structures)
