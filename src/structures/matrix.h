@@ -10,8 +10,8 @@
 #define MATRIX_H
 
 #include "common.h"
+#include "stringbuffer.h"
 #include <stdbool.h>
-#define MAX_TAB 256
 
 /*-----------------------------------------------------------------*/
 
@@ -218,10 +218,10 @@ char *line_to_string(ptrLine line, const char *delimiter);
  * @brief Structure for holding a matrix of data.
  */
 typedef struct s_matrix {
-    char **candidates; ///< Array of strings holding candidate names.
-    ptrLine *data;     ///< Array of pointers to lines holding the data of the matrix.
-    uint rows;         ///< Number of rows in the matrix.
-    uint columns;      ///< Number of columns in the matrix.
+    StringBuffer candidates[MAX_TAB]; ///< Array of strings holding candidate names.
+    ptrLine data[MAX_TAB]; ///< Array of pointers to lines holding the data of the matrix.
+    uint rows;             ///< Number of rows in the matrix.
+    uint columns;          ///< Number of columns in the matrix.
 } Matrix;
 
 /**
@@ -246,126 +246,122 @@ typedef Matrix *ptrMatrix;
 ptrMatrix init_matrix(void);
 
 /**
+ * @brief Retrieves the number of rows in a matrix.
+ *
+ * This function returns the current number of rows in the given matrix.
+ *
+ * @param[in] matrix The matrix whose row count is to be retrieved.
+ *
+ * @return The number of rows in the matrix.
+ */
+uint get_matrix_rows(const ptrMatrix matrix);
+
+/**
+ * @brief Retrieves the number of columns in a matrix.
+ *
+ * This function returns the current number of columns in the given matrix.
+ *
+ * @param[in] matrix The matrix whose column count is to be retrieved.
+ *
+ * @return The number of columns in the matrix.
+ */
+uint get_matrix_columns(const ptrMatrix matrix);
+
+/**
  * @defgroup CandidateHandling Candidate Handling
  * @{
  */
 
 /**
- * @brief Sets up the candidate names in a matrix.
+ * @brief Sets up the candidate names in a matrix using StringBuffers.
  *
- * This function sets up the candidates field in the matrix with the provided names.
- * It allocates memory for the candidates field and copies the provided names into it.
- * It also frees the memory occupied by the original names after copying them.
+ * This function initializes the candidates field in the matrix with the provided StringBuffers.
+ * Each candidate name is represented by a StringBuffer in the candidates array.
  *
  * @pre
  *   - The matrix pointer must not be NULL.
- *   - The candidates pointer must be NULL.
- *   - The names pointer must not be NULL.
- *   - The names_count must be greater than 0.
+ *   - The candidateBuffers pointer must not be NULL.
+ *   - The names_count must be within the bounds of MAX_TAB.
  *
  * @param[in,out] matrix Pointer to the matrix.
- * @param[in] names Pointer to the array of names.
+ * @param[in] candidateBuffers Pointer to the array of StringBuffer pointers.
  * @param[in] names_count The number of names.
- *
- * @warning
- *   - This function frees the memory of the original names after copying them.
- *   - The caller is responsible for ensuring that the names pointer is valid.
  */
-void setup_candidates(ptrMatrix matrix, char **names, uint names_count);
+void setup_candidates(ptrMatrix matrix, ptrStringBuffer *candidateBuffers, uint names_count);
 
 /**
  * @brief Clears all candidate names from a matrix.
  *
- * This function frees all memory occupied by the candidate names in the matrix and sets the
- * candidates pointer to NULL.
+ * This function resets all StringBuffers in the candidates array of the matrix.
  *
  * @pre The matrix pointer must not be NULL.
  *
  * @param[in,out] matrix Pointer to the matrix.
- *
- * @post
- *   - All memory occupied by candidate names is freed.
- *   - The candidates pointer is set to NULL.
  */
 void clear_candidate_names(ptrMatrix matrix);
 
 /**
- * @brief Inserts a candidate name into a matrix.
+ * @brief Inserts a candidate name into a matrix using a StringBuffer.
  *
  * This function inserts a new candidate name into the candidates array at the specified index,
- * shifting all subsequent names down.
+ * using a StringBuffer. Existing candidate at the index is replaced.
  *
  * @pre
  *   - The matrix pointer must not be NULL.
- *   - The name pointer must not be NULL.
- *   - The index must be within the bounds of the candidates array (0 <= index <= number of
- *     candidates).
+ *   - The candidateBuffer must not be NULL.
+ *   - The index must be within the bounds of MAX_TAB.
  *
  * @param[in,out] matrix Pointer to the matrix.
- * @param[in] name The name of the candidate to insert.
+ * @param[in] candidateBuffer The StringBuffer containing the candidate name to insert.
  * @param[in] index The index at which to insert the new candidate name.
- *
- * @warning
- *   - This function allocates additional memory for the new candidate name.
- *   - The caller is responsible for ensuring that the name pointer is valid.
  */
-void insert_candidate_name(ptrMatrix matrix, const char *name, uint index);
+void insert_candidate_name(ptrMatrix matrix, ptrStringBuffer candidateBuffer, uint index);
 
 /**
- * @brief Sets a candidate name in a matrix.
+ * @brief Sets a candidate name in a matrix using a StringBuffer.
+ *
+ * This function sets or replaces the candidate name at the specified index in the candidates array,
+ * using a StringBuffer.
  *
  * @pre
  *   - The matrix pointer must not be NULL.
- *   - The index must be within the bounds of the candidates array.
+ *   - The index must be within the bounds of MAX_TAB.
  *
  * @param[in,out] matrix Pointer to the matrix.
  * @param[in] index The index of the candidate name to set.
- * @param[in] name The new candidate name.
- *
- * @warning
- *   - This function performs a deep copy of the candidate name.
- *   - The previous candidate name at the specified index will be freed.
+ * @param[in] candidateBuffer The StringBuffer containing the new candidate name.
  */
-void set_candidate_name(ptrMatrix matrix, uint index, char *name);
+void set_candidate_name(ptrMatrix matrix, uint index, ptrStringBuffer candidateBuffer);
 
 /**
- * @brief Retrieves a copy of a candidate name from a matrix.
+ * @brief Retrieves a StringBuffer containing a candidate name from a matrix.
  *
- * This function allocates memory for a new string, copies the specified candidate name from the
- * matrix into this new string, and returns the new string.
+ * This function returns a pointer to the StringBuffer containing the candidate name at the
+ * specified index.
  *
  * @pre
  *   - The matrix pointer must not be NULL.
- *   - The index parameter must be within the bounds of the candidates array (0 <= index < number of
- *     candidates).
+ *   - The index must be within the bounds of MAX_TAB.
  *
  * @param[in] matrix Pointer to the matrix.
  * @param[in] index The index of the candidate name to retrieve.
  *
- * @return A newly-allocated string containing a copy of the specified candidate name.
- *         Returns NULL if memory allocation fails.
- *
- * @warning The caller is responsible for freeing the memory occupied by the returned string.
+ * @return Pointer to the StringBuffer containing the candidate name. NULL if the index is out of
+ * bounds.
  */
-char *get_candidate_name(ptrMatrix matrix, uint index);
+ptrStringBuffer get_candidate_name(ptrMatrix matrix, uint index);
 
 /**
  * @brief Deletes a candidate name from a matrix.
  *
- * This function deletes a candidate name from the candidates array at the specified index, shifting
- * all subsequent names up.
+ * This function clears the StringBuffer at the specified index in the candidates array.
  *
  * @pre
  *   - The matrix pointer must not be NULL.
- *   - The index must be within the bounds of the candidates array (0 <= index < number of
- *     candidates).
+ *   - The index must be within the bounds of MAX_TAB.
  *
  * @param[in,out] matrix Pointer to the matrix.
  * @param[in] index The index of the candidate name to delete.
- *
- * @post
- *   - The specified candidate name is deleted from the matrix.
- *   - All subsequent candidate names are shifted up.
  */
 void delete_candidate_name(ptrMatrix matrix, uint index);
 

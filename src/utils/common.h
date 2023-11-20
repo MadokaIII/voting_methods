@@ -1,4 +1,5 @@
-#ifndef __COMMON_H__
-#define __COMMON_H__
+#ifndef COMMON_H
+#define COMMON_H
+#define MAX_TAB 256
 typedef unsigned int uint;
 #endif

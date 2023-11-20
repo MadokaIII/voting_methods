@@ -2,11 +2,12 @@
 /** Advanced Project
  *  @author LAMALMI Daoud
  *  @date 02/11/2023
- *  @file Implementation of Matrixes
+ *  @file Implementation of Matrices
  **/
 /*-----------------------------------------------------------------*/
 
 #include "matrix.h"
+#include "stringbuffer.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -17,8 +18,6 @@ ptrMatrix init_matrix(void) {
     ptrMatrix matrix = malloc(sizeof(Matrix));
     if (matrix == NULL)
         return NULL;
-    matrix->data = NULL;
-    matrix->candidates = NULL;
     matrix->rows = matrix->columns = 0;
     return matrix;
 }
@@ -26,14 +25,11 @@ ptrMatrix init_matrix(void) {
 bool is_empty_matrix(ptrMatrix matrix) { return !matrix->rows; }
 
 void add_row(ptrMatrix matrix, ptrLine row) {
+    assert(matrix->rows < MAX_TAB);
     if (is_empty_matrix(matrix)) {
         matrix->columns = row->size;
     }
     assert(matrix->columns == row->size);
-    ptrLine *temp = realloc(matrix->data, (matrix->rows + 1) * sizeof(ptrLine));
-    if (temp == NULL)
-        return;
-    matrix->data = temp;
     matrix->data[matrix->rows] = malloc(sizeof(Line));
     for (uint i = 0; i < row->size; i++)
         matrix->data[matrix->rows]->data[i] = row->data[i];
