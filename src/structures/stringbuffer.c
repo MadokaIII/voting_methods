@@ -38,9 +38,60 @@ ptrStringBuffer init_stringbuffer(const char *initialString, uint size) {
     return sb;
 }
 
+void init_stringbuffer_stack(ptrStringBuffer stringBuffer, const char *initialString, uint size) {
+    assert(stringBuffer != NULL);
+    assert(size < MAX_STRING_SIZE);
+
+    memset(stringBuffer, 0, sizeof(StringBuffer));
+
+    stringBuffer->string = calloc(size + 1, sizeof(char));
+    if (stringBuffer->string == NULL) {
+        return;
+    }
+    if (initialString != NULL) {
+        strncpy(stringBuffer->string, initialString, size);
+        stringBuffer->string[size] = '\0';
+        stringBuffer->size++;
+    }
+}
+
 uint get_stringbuffer_length(const ptrStringBuffer stringBuffer) { return stringBuffer->size; }
 
 bool is_empty_stringbuffer(const ptrStringBuffer stringBuffer) { return !stringBuffer->size; }
+
+bool is_first_stringbuffer_in_better_order(const ptrStringBuffer stringBuffer1,
+                                           const ptrStringBuffer stringBuffer2) {
+    assert(stringBuffer1 != NULL && stringBuffer1->string != NULL);
+    assert(stringBuffer2 != NULL && stringBuffer2->string != NULL);
+
+    uint minLength =
+        (stringBuffer1->size < stringBuffer2->size) ? stringBuffer1->size : stringBuffer2->size;
+
+    for (uint i = 0; i < minLength; ++i) {
+        char ch1 = stringBuffer1->string[i];
+        char ch2 = stringBuffer2->string[i];
+
+        // Skip spaces, newline, and null terminators in both strings
+        if (ch1 == ' ' || ch1 == '\n' || ch1 == '\0' || ch2 == ' ' || ch2 == '\n' || ch2 == '\0') {
+            continue;
+        }
+
+        // Convert both characters to lowercase
+        if (ch1 >= 'A' && ch1 <= 'Z')
+            ch1 += 'a' - 'A';
+        if (ch2 >= 'A' && ch2 <= 'Z')
+            ch2 += 'a' - 'A';
+
+        // Compare the characters
+        if (ch1 < ch2)
+            return true;
+        if (ch1 > ch2)
+            return false;
+    }
+
+    // If all characters so far were equal, the shorter string comes first
+    return stringBuffer1->size < stringBuffer2->size;
+}
 
 int append_string(ptrStringBuffer stringBuffer, const char *str, uint size) {
     assert(stringBuffer != NULL);

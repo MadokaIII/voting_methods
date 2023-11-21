@@ -7,7 +7,6 @@
 /*-----------------------------------------------------------------*/
 
 #include "matrix.h"
-#include "stringbuffer.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>

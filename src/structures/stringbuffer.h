@@ -9,8 +9,8 @@
 #ifndef STRINGBUFFER_H
 #define STRINGBUFFER_H
 
-#define MAX_STRING_SIZE 2048
-#include "common.h"
+#define MAX_STRING_SIZE 1024
+#include "miscellaneous.h"
 #include <stdbool.h>
 
 /*-----------------------------------------------------------------*/
@@ -58,6 +58,34 @@ typedef StringBuffer *ptrStringBuffer;
 ptrStringBuffer init_stringbuffer(const char *initialString, uint size);
 
 /**
+ * @brief Initializes a stack-allocated StringBuffer with an optional initial string.
+ *
+ * This function is designed for initializing a StringBuffer that is allocated on the stack, as
+ * opposed to dynamically allocated with malloc. It initializes the provided StringBuffer instance
+ * with the contents of the given string, up to the specified size. The function sets the size of
+ * the StringBuffer and ensures proper null termination of the string.
+ *
+ * @param[out] stringBuffer The stack-allocated StringBuffer to initialize. Must not be NULL.
+ * @param[in] initialString The initial string to copy into the buffer, or NULL for an empty buffer.
+ * @param[in] size The maximum number of characters to copy from the initial string.
+ *
+ * @pre
+ *   - sb must be a valid, non-NULL pointer to a stack-allocated StringBuffer.
+ *   - size must be less than MAX_STRING_SIZE.
+ *
+ * @post
+ *   - sb is initialized with the contents of initialString, or as an empty string if initialString
+ * is NULL.
+ *   - The content of sb is overwritten, and any previous data is lost.
+ *
+ * @note
+ *   - This function is suitable for StringBuffer instances that are not dynamically allocated.
+ *   - Ensure that the string array inside StringBuffer is adequately sized to hold initialString
+ *     plus a null terminator.
+ */
+void init_stringbuffer_stack(ptrStringBuffer stringBuffer, const char *initialString, uint size);
+
+/**
  * @brief Returns the length of the string in the StringBuffer.
  *
  * @param[in] stringBuffer The StringBuffer whose length is to be determined.
@@ -78,6 +106,40 @@ uint get_stringbuffer_length(const ptrStringBuffer stringBuffer);
  * @return True if the StringBuffer is empty (i.e., its size is 0), false otherwise.
  */
 bool is_empty_stringbuffer(const ptrStringBuffer stringBuffer);
+
+/**
+ * @brief Compares two StringBuffers to determine their alphabetical order.
+ *
+ * This function compares two StringBuffers to check if the first is lexicographically
+ * before the second one, considering alphabetical order. The comparison is
+ * case-insensitive and skips spaces, newline characters, and null terminators.
+ * The function returns true if the first string is in a better alphabetical order
+ * compared to the second one, and false otherwise.
+ *
+ * @param[in] stringBuffer1 The first StringBuffer to compare.
+ * @param[in] stringBuffer2 The second StringBuffer to compare.
+ *
+ * @return
+ *   - true if the first string is lexicographically before the second string.
+ *   - false if the first string is lexicographically after or equal to the second string.
+ *
+ * @pre
+ *   - Both stringBuffer1 and stringBuffer2 must be valid, non-NULL pointers to initialized
+ * StringBuffers.
+ *   - The StringBuffers should contain data to process.
+ *
+ * @post
+ *   - The original content of both StringBuffers remains unchanged.
+ *   - The function does not modify the StringBuffers.
+ *
+ * @note
+ *   - The comparison is case-insensitive.
+ *   - The function skips spaces, newline characters, and null terminators during comparison.
+ *   - If the strings are equal up to the length of the shorter one, the shorter string is
+ *     considered to be in a better order.
+ */
+bool is_first_stringbuffer_in_better_order(const ptrStringBuffer stringBuffer1,
+                                           const ptrStringBuffer stringBuffer2);
 
 /**
  * @brief Appends a C string to a StringBuffer.
