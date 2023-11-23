@@ -1,4 +1,4 @@
-CC = gcc
+CC = clang
 CFLAGS = -std=c18 -D_POSIX_C_SOURCE=200809L
 DEBUG_FLAGS = -g -O0 -DDEBUG -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-omit-frame-pointer -W -Wall -Wextra -Werror -Wfatal-errors -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -rdynamic
 OBJ_DIR = obj

@@ -51,7 +51,7 @@ void init_stringbuffer_stack(ptrStringBuffer stringBuffer, const char *initialSt
     if (initialString != NULL) {
         strncpy(stringBuffer->string, initialString, size);
         stringBuffer->string[size] = '\0';
-        stringBuffer->size++;
+        stringBuffer->size = size;
     }
 }
 
