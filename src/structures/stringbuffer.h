@@ -125,7 +125,7 @@ bool is_empty_stringbuffer(const ptrStringBuffer stringBuffer);
  *
  * @pre
  *   - Both stringBuffer1 and stringBuffer2 must be valid, non-NULL pointers to initialized
- * StringBuffers.
+ *     StringBuffers.
  *   - The StringBuffers should contain data to process.
  *
  * @post
@@ -138,8 +138,7 @@ bool is_empty_stringbuffer(const ptrStringBuffer stringBuffer);
  *   - If the strings are equal up to the length of the shorter one, the shorter string is
  *     considered to be in a better order.
  */
-bool is_first_stringbuffer_in_better_order(const ptrStringBuffer stringBuffer1,
-                                           const ptrStringBuffer stringBuffer2);
+bool stringbuffer_compare(const ptrStringBuffer stringBuffer1, const ptrStringBuffer stringBuffer2);
 
 /**
  * @brief Appends a C string to a StringBuffer.
@@ -254,6 +253,19 @@ void print_stringbuffer(const ptrStringBuffer stringBuffer, uint outputType);
  *   - Passing a NULL pointer to this function will have no effect.
  */
 void delete_stringbuffer(ptrStringBuffer stringBuffer);
+
+/**
+ * @brief Frees the string inside the buffer.
+ *
+ * This function deallocates the memory used by the StringBuffer's internal string (`string`).
+ *
+ *
+ * @param[in,out] stringBuffer The StringBuffer to delete its string.
+ *
+ * @warning
+ *   - Passing a NULL pointer to this function will have no effect.
+ */
+void delete_stringbuffer_stack(StringBuffer stringBuffer);
 
 /** @} */ // End of StringBuffer group
 

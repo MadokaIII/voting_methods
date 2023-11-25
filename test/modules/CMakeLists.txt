@@ -7,6 +7,9 @@ enable_testing()
 # Include the directory where modules library headers are located
 include_directories(../../src/modules)
 
+# Include the directory where test_code.h is located
+include_directories(../)
+
 # Collect all test source files
 file(GLOB TEST_SRC "*.c")
 

@@ -228,6 +228,37 @@ void update_vote(ptrList list, StringBuffer candidate, int votes);
 void delete_element(ptrList list, StringBuffer candidate);
 
 /**
+ * @brief Converts a List into a StringBuffer representation and returns a new StringBuffer.
+ *
+ * This function takes a List and converts its contents into a StringBuffer format. It is useful for
+ * displaying the contents of the List or for debugging purposes. The function iterates through each
+ * element in the List, appending the candidate's string representation and corresponding vote count
+ * to a newly allocated StringBuffer, which it then returns.
+ *
+ * @param[in] list The List to be converted to a StringBuffer. Must not be NULL.
+ *
+ * @return
+ *   - A pointer to a newly allocated StringBuffer containing the string representation of the List.
+ *   - NULL if the allocation fails or if the list parameter is NULL.
+ *
+ * @pre
+ *   - list must be a valid, non-NULL pointer to an initialized List.
+ *
+ * @post
+ *   - The returned StringBuffer contains the string representation of the List.
+ *   - Each element in the list is represented by its candidate string and vote count, separated by
+ *     appropriate delimiters.
+ *   - The responsibility of freeing the returned StringBuffer lies with the caller.
+ *
+ * @note
+ *   - The function dynamically allocates memory for the StringBuffer, which must be freed by the
+ *     caller to avoid memory leaks.
+ *   - The format of the output string is implementation-specific and should be documented
+ *     separately.
+ */
+ptrStringBuffer list_to_stringbuffer(ptrList list);
+
+/**
  * @brief Clears the contents of a List.
  *
  * This function resets a List by clearing its candidates and votes arrays, and setting

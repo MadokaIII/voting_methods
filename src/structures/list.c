@@ -9,6 +9,7 @@
 #include "list.h"
 #include "stringbuffer.h"
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -36,7 +37,7 @@ void add_element(ptrList list, StringBuffer candidate, int votes) {
 
     uint insertPos = list->size;
     for (uint i = 0; i < list->size; i++) {
-        if (is_first_stringbuffer_in_better_order(&candidate, &list->candidates[i])) {
+        if (stringbuffer_compare(&candidate, &list->candidates[i])) {
             insertPos = i;
             break;
         }
@@ -47,7 +48,9 @@ void add_element(ptrList list, StringBuffer candidate, int votes) {
         list->votes[i] = list->votes[i - 1];
     }
 
-    list->candidates[insertPos] = candidate;
+    StringBuffer current;
+    init_stringbuffer_stack(&current, candidate.string, candidate.size);
+    list->candidates[insertPos] = current;
     list->votes[insertPos] = votes;
     list->size++;
 }
@@ -63,7 +66,7 @@ int search_candidate(const ptrList list, const ptrStringBuffer candidate) {
         if (strcmp(list->candidates[mid].string, candidate->string) == 0) {
             return mid;
         }
-        if (is_first_stringbuffer_in_better_order(candidate, &list->candidates[mid])) {
+        if (stringbuffer_compare(candidate, &list->candidates[mid])) {
             left = mid + 1;
         } else {
             right = mid - 1;
@@ -93,6 +96,7 @@ void delete_element(ptrList list, StringBuffer candidate) {
     int pos = search_candidate(list, &candidate);
     if (pos == -1)
         return;
+    delete_stringbuffer_stack(list->candidates[pos]);
     for (uint i = (uint)pos; i < list->size - 1; i++) {
         list->candidates[i] = list->candidates[i + 1];
         list->votes[i] = list->votes[i + 1];
@@ -100,14 +104,39 @@ void delete_element(ptrList list, StringBuffer candidate) {
     list->size--;
 }
 
+ptrStringBuffer list_to_stringbuffer(ptrList list) {
+    if (list == NULL)
+        return NULL;
+
+    // Dynamically allocate a new StringBuffer
+    ptrStringBuffer buffer = init_stringbuffer("", 0);
+    if (buffer == NULL)
+        return NULL;
+
+    char temp[MAX_STRING_SIZE];
+    for (uint i = 0; i < list->size; i++) {
+        int_to_string(list->votes[i], temp, sizeof(temp));
+
+        // Append candidate, votes and newline to the buffer
+        append_stringbuffer(buffer, &list->candidates[i]);
+        append_string(buffer, " - ", 3);
+        append_string(buffer, temp, strlen(temp));
+        append_string(buffer, "\n", 1);
+    }
+
+    return buffer;
+}
+
 void clear_list(ptrList list) {
     assert(list != NULL);
-    memset(&list->candidates, 0, sizeof(StringBuffer) * MAX_TAB);
+    for (uint i = 0; i < list->size; i++)
+        delete_stringbuffer_stack(list->candidates[i]);
     memset(&list->votes, 0, sizeof(int) * MAX_TAB);
     list->size = 0;
 }
 
 void delete_list(ptrList list) {
     assert(list != NULL);
+    clear_list(list);
     free(list);
 }

@@ -45,9 +45,9 @@ void init_stringbuffer_stack(ptrStringBuffer stringBuffer, const char *initialSt
     memset(stringBuffer, 0, sizeof(StringBuffer));
 
     stringBuffer->string = calloc(size + 1, sizeof(char));
-    if (stringBuffer->string == NULL) {
+    if (stringBuffer->string == NULL)
         return;
-    }
+
     if (initialString != NULL) {
         strncpy(stringBuffer->string, initialString, size);
         stringBuffer->string[size] = '\0';
@@ -59,8 +59,8 @@ uint get_stringbuffer_length(const ptrStringBuffer stringBuffer) { return string
 
 bool is_empty_stringbuffer(const ptrStringBuffer stringBuffer) { return !stringBuffer->size; }
 
-bool is_first_stringbuffer_in_better_order(const ptrStringBuffer stringBuffer1,
-                                           const ptrStringBuffer stringBuffer2) {
+bool stringbuffer_compare(const ptrStringBuffer stringBuffer1,
+                          const ptrStringBuffer stringBuffer2) {
     assert(stringBuffer1 != NULL && stringBuffer1->string != NULL);
     assert(stringBuffer2 != NULL && stringBuffer2->string != NULL);
 
@@ -150,4 +150,9 @@ void delete_stringbuffer(ptrStringBuffer stringBuffer) {
     assert(stringBuffer != NULL);
     clear_stringbuffer(stringBuffer);
     free(stringBuffer);
+}
+
+void delete_stringbuffer_stack(StringBuffer stringBuffer) {
+    assert(stringBuffer.string != NULL);
+    free(stringBuffer.string);
 }
