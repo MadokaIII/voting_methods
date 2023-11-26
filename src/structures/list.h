@@ -84,14 +84,12 @@ ptrList init_list(void);
 void set_list(ptrList list, StringBuffer candidates[], int votes[], uint size);
 
 /**
- * @brief Adds a new element to a List in sorted order.
+ * @brief Adds a new element to a List.
  *
  * This function inserts a new element into the List, consisting of a StringBuffer and an
- * associated vote count. The new element is inserted in such a way that the List
- * maintains an order based on the alphabetical order of the StringBuffers. The function
- * finds the correct position to insert the new element and then shifts the existing
- * elements down to make room for it. The List size is then incremented to reflect the
- * addition of the new element.
+ * associated vote count. The function finds the correct position to insert the new element
+ * while maintaining the order based on the alphabetical order of the StringBuffers and
+ * then shifts the existing elements down to make room for it.
  *
  * @param[in,out] list The List to which the new element is added. Must not be NULL.
  * @param[in] candidate The StringBuffer representing the candidate to be added.
@@ -102,15 +100,8 @@ void set_list(ptrList list, StringBuffer candidates[], int votes[], uint size);
  *   - The list size must be less than MAX_TAB before adding the new element.
  *
  * @post
- *   - The new element (candidate and votes) is inserted into the list in a position
- *     that maintains the list's sorted order.
- *   - The size of the list is incremented by 1.
- *
- * @note
- *   - The function assumes that the StringBuffer is properly initialized and does not require
- *     deep copying for its internal data.
- *   - If the List is already at its capacity (size equals MAX_TAB), the new element will not be
- *     added.
+ *   - The new element is inserted into the list, and the list size is incremented.
+ *   - The candidates in the list are kept in alphabetical order.
  */
 void add_element(ptrList list, StringBuffer candidate, int votes);
 
@@ -202,10 +193,8 @@ void update_vote(ptrList list, StringBuffer candidate, int votes);
  * @brief Deletes a candidate and their vote count from the list.
  *
  * This function removes a specified candidate and their associated vote count from the list.
- * It first locates the candidate in the list using the `search_candidate` function. If the
- * candidate is found, the function removes them from the list and shifts the subsequent
- * elements up to fill the gap. The size of the list is decremented to reflect the removal.
- * If the candidate is not found, the function does nothing.
+ * It first locates the candidate using `search_candidate`. If found, it deletes the
+ * StringBuffer for the candidate and shifts the subsequent elements up to fill the gap.
  *
  * @param[in,out] list The list from which the candidate is to be removed. Must not be NULL.
  * @param[in] candidate The candidate to be removed from the list.
@@ -215,56 +204,38 @@ void update_vote(ptrList list, StringBuffer candidate, int votes);
  *   - The candidate must exist in the list to be successfully removed.
  *
  * @post
- *   - If the candidate is found, they and their vote count are removed from the list.
- *   - The subsequent elements in the list are shifted up to fill the gap created by the removal.
- *   - The size of the list is decremented by 1.
- *   - If the candidate is not found, the list remains unchanged.
- *
- * @note
- *   - The function relies on `search_candidate` to find the candidate's position in the list.
- *   - The candidate is identified based on the content of the StringBuffer passed in.
- *   - The list is assumed to be sorted, and the removal of an element may affect the sorting.
+ *   - If the candidate is found, they are removed from the list, and the list size is decremented.
  */
 void delete_element(ptrList list, StringBuffer candidate);
 
 /**
- * @brief Converts a List into a StringBuffer representation and returns a new StringBuffer.
+ * @brief Converts a List into a StringBuffer representation.
  *
- * This function takes a List and converts its contents into a StringBuffer format. It is useful for
- * displaying the contents of the List or for debugging purposes. The function iterates through each
- * element in the List, appending the candidate's string representation and corresponding vote count
- * to a newly allocated StringBuffer, which it then returns.
+ * This function creates a new StringBuffer and populates it with the string representation
+ * of the provided List. Each element (candidate and vote count) in the List is converted to a
+ * string and appended to the StringBuffer.
  *
  * @param[in] list The List to be converted to a StringBuffer. Must not be NULL.
  *
  * @return
  *   - A pointer to a newly allocated StringBuffer containing the string representation of the List.
- *   - NULL if the allocation fails or if the list parameter is NULL.
+ *   - NULL if the allocation fails or if the list is NULL.
  *
  * @pre
  *   - list must be a valid, non-NULL pointer to an initialized List.
  *
  * @post
  *   - The returned StringBuffer contains the string representation of the List.
- *   - Each element in the list is represented by its candidate string and vote count, separated by
- *     appropriate delimiters.
  *   - The responsibility of freeing the returned StringBuffer lies with the caller.
- *
- * @note
- *   - The function dynamically allocates memory for the StringBuffer, which must be freed by the
- *     caller to avoid memory leaks.
- *   - The format of the output string is implementation-specific and should be documented
- *     separately.
  */
 ptrStringBuffer list_to_stringbuffer(ptrList list);
 
 /**
  * @brief Clears the contents of a List.
  *
- * This function resets a List by clearing its candidates and votes arrays, and setting
- * its size to 0. It uses memset to set all bytes in the candidates and votes arrays to zero.
- * This effectively clears any stored data in these arrays. The function is suitable for
- * resetting a List to an empty state.
+ * This function resets a List by clearing its candidates and votes arrays and setting
+ * its size to 0. It frees any dynamically allocated memory associated with each candidate
+ * before clearing the arrays.
  *
  * @param[in,out] list The List to be cleared. Must not be NULL.
  *
@@ -272,24 +243,17 @@ ptrStringBuffer list_to_stringbuffer(ptrList list);
  *   - list must be a valid, non-NULL pointer to an initialized List.
  *
  * @post
- *   - The candidates and votes arrays in the list are cleared (set to zero).
- *   - The size of the list is set to 0, indicating it is empty.
- *
- * @note
- *   - This function only clears the contents of the list and does not deallocate any memory.
- *   - If the StringBuffer in the candidates array contains dynamically allocated memory,
- *     this function does not free that memory. Ensure to handle memory management appropriately
- *     if your StringBuffer implementation requires it.
+ *   - The candidates and votes arrays in the list are cleared.
+ *   - The size of the list is set to 0.
  */
 void clear_list(ptrList list);
 
 /**
  * @brief Frees the memory allocated for a List.
  *
- * This function deallocates the memory allocated for a dynamically allocated List. It should be
- * used when a List created with init_list is no longer needed. The function frees the memory
- * allocated for the List itself, including its internal arrays of StringBuffer candidates and
- * integer votes, assuming these arrays are part of the List's memory block.
+ * This function deallocates the memory allocated for a dynamically allocated List. It first
+ * clears the List to free any dynamically allocated memory in the candidates, then frees
+ * the List itself.
  *
  * @param[in] list The pointer to the List to be deallocated. Must not be NULL.
  *
@@ -297,14 +261,7 @@ void clear_list(ptrList list);
  *   - list must be a valid, non-NULL pointer to a dynamically allocated List.
  *
  * @post
- *   - The memory allocated for the list and its internal arrays is freed.
- *   - The pointer list should not be used after this function is called.
- *
- * @note
- *   - This function only frees the List itself. If the StringBuffer elements in the List contain
- *     dynamically allocated memory (e.g., internally allocated strings), ensure that this memory is
- *     freed before calling this function to avoid memory leaks.
- *   - After calling delete_list, the pointer to the List becomes invalid.
+ *   - The List and its contents are freed.
  */
 void delete_list(ptrList list);
 

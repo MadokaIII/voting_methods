@@ -6,7 +6,6 @@
  **/
 /*-----------------------------------------------------------------*/
 
-#define STDOUT 1
 #include "stringbuffer.h"
 #include <assert.h>
 #include <stdio.h>

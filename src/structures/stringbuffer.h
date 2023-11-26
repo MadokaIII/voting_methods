@@ -9,7 +9,6 @@
 #ifndef STRINGBUFFER_H
 #define STRINGBUFFER_H
 
-#define MAX_STRING_SIZE 1024
 #include "miscellaneous.h"
 #include <stdbool.h>
 
@@ -21,11 +20,45 @@
  */
 
 /**
+ * @brief Macro defining the maximum size of a string in a StringBuffer.
+ *
+ * This macro specifies the upper limit on the size of strings that can be held
+ * in a StringBuffer. It is used throughout the StringBuffer module to ensure
+ * that string operations such as initialization, appending, and copying do not
+ * exceed this predefined size limit. The value of 'MAX_STRING_SIZE' is set to
+ * 2048, meaning that the maximum length of a string, including the null terminator,
+ * is 2048 characters.
+ *
+ * @note
+ *   - It is crucial for string operations in the StringBuffer module to respect this limit
+ *     to prevent buffer overflows and ensure memory safety.
+ *   - When working with StringBuffers, always consider this limit to avoid truncation
+ *     or other unintended behavior with longer strings.
+ */
+#define MAX_STRING_SIZE 2048
+
+/**
+ * @brief Macro defining the output type for standard output (stdout).
+ *
+ * This macro is used as a parameter value in the 'print_stringbuffer' function to
+ * indicate that the contents of a StringBuffer should be printed to the standard output (stdout).
+ * The value 'STDOUT' is set to 1, and it is used to direct the output flow in 'print_stringbuffer'
+ * or any other function that requires specifying an output type.
+ *
+ * @note
+ *   - This macro is an integral part of controlling output behavior in functions like
+ *     'print_stringbuffer', allowing for flexibility in redirecting output as needed.
+ *   - It is recommended to use this macro instead of directly using the numeric value
+ *     to enhance code readability and maintainability.
+ */
+#define STDOUT 1
+
+/**
  * @brief Structure for holding a string (long strings)
  */
 typedef struct s_stringbuffer {
-    char *string; ///< pointer to the start of the string.
-    uint size;    ///< Number of char in the string.
+    char *string; ///< Pointer to the start of the string.
+    uint size;    ///< Number of characters in the string.
 } StringBuffer;
 
 /**
@@ -239,31 +272,49 @@ void clear_stringbuffer(ptrStringBuffer stringBuffer);
 void print_stringbuffer(const ptrStringBuffer stringBuffer, uint outputType);
 
 /**
- * @brief Deletes a StringBuffer, freeing all associated memory.
+ * @brief Deletes a dynamically allocated StringBuffer, freeing all associated memory.
  *
- * This function deallocates the memory used by the StringBuffer's internal string (`string`)
- * and the StringBuffer structure itself. After this operation, the pointer to the
- * StringBuffer will be invalid and should not be used.
+ * This function deallocates the memory used by the internal string (`string`) of a
+ * dynamically allocated StringBuffer and then frees the memory of the StringBuffer
+ * structure itself. After this operation, the pointer to the StringBuffer will be
+ * invalid and should not be used.
  *
- * @param[in,out] stringBuffer The StringBuffer to delete.
+ * @param[in,out] stringBuffer The dynamically allocated StringBuffer to delete.
+ *
+ * @pre
+ *   - stringBuffer must be a valid, non-NULL pointer to a dynamically allocated StringBuffer.
+ *
+ * @post
+ *   - The memory for the internal string and the StringBuffer structure is freed.
+ *   - The stringBuffer pointer becomes invalid.
  *
  * @warning
- *   - After calling this function, the pointer to the StringBuffer becomes invalid.
- *          Do not attempt to use it further.
  *   - Passing a NULL pointer to this function will have no effect.
+ *   - After calling this function, the pointer to the StringBuffer becomes invalid.
+ *     Do not attempt to use it further.
  */
 void delete_stringbuffer(ptrStringBuffer stringBuffer);
 
 /**
- * @brief Frees the string inside the buffer.
+ * @brief Frees the internal string of a stack-allocated StringBuffer.
  *
- * This function deallocates the memory used by the StringBuffer's internal string (`string`).
+ * This function deallocates the memory used by the internal string (`string`) of a
+ * stack-allocated StringBuffer. The StringBuffer structure itself is not freed as
+ * it is presumed to be allocated on the stack.
  *
+ * @param[in,out] stringBuffer The stack-allocated StringBuffer to delete its string.
  *
- * @param[in,out] stringBuffer The StringBuffer to delete its string.
+ * @pre
+ *   - stringBuffer must be a valid, non-NULL StringBuffer.
+ *   - The internal string of stringBuffer must be dynamically allocated.
+ *
+ * @post
+ *   - The memory for the internal string of the StringBuffer is freed.
  *
  * @warning
- *   - Passing a NULL pointer to this function will have no effect.
+ *   - The function does not free the StringBuffer structure itself, only the internal string.
+ *   - Passing a NULL pointer or a StringBuffer with no allocated internal string will have no
+ *     effect.
  */
 void delete_stringbuffer_stack(StringBuffer stringBuffer);
 

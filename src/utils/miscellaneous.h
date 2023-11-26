@@ -57,6 +57,36 @@ typedef unsigned int uint;
  */
 void int_to_string(int value, char *str, int max_len);
 
+/**
+ * @brief Generates a random alphanumeric string.
+ *
+ * This function creates a random string consisting of both uppercase and lowercase
+ * alphabetical characters and spaces. The generated string is useful for scenarios
+ * where a random text value is needed. The length of the string is determined by
+ * the 'length' parameter, and the function ensures that the string is null-terminated.
+ *
+ * @param[out] str The buffer where the generated string will be stored.
+ * @param[in] length The desired length of the string, including the null terminator.
+ *
+ * @pre
+ *   - str must be a valid pointer to a char array.
+ *   - length must be greater than 0.
+ *   - The size of the buffer pointed to by str must be at least 'length' characters.
+ *
+ * @post
+ *   - The buffer pointed to by str contains a random string of length 'length - 1'
+ *     followed by a null terminator.
+ *   - Each character in the string (excluding the null terminator) is randomly chosen
+ *     from the set of uppercase and lowercase letters and spaces.
+ *
+ * @note
+ *   - The function uses 'rand()' to generate random characters, which should have been
+ *     seeded previously using 'srand()' for true randomness.
+ *   - Ensure that the random seed is set (using srand) before calling this function
+ *     if different random sequences are desired on different program runs.
+ */
+void generate_random_string(char *str, int length);
+
 /** @} */ // End of Miscellaneous group
 
 #endif // MISCELLANEOUS_H

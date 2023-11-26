@@ -13,5 +13,15 @@
 
 #include "miscellaneous.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void int_to_string(int value, char *str, int max_len) { snprintf(str, max_len, "%d", value); }
+
+void generate_random_string(char *str, int length) {
+    char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
+    for (int i = 0; i < length - 1; ++i) {
+        int index = rand() % (sizeof(alphabet) - 1);
+        str[i] = alphabet[index];
+    }
+    str[length - 1] = '\0';
+}
