@@ -1,6 +1,6 @@
 #include "list.h"
 #include "stringbuffer.h"
-#include "test_code.h"
+#include "test_structure.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

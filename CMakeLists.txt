@@ -25,5 +25,5 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Add subdirectories
 add_subdirectory(src)
-add_subdirectory(test)
 add_subdirectory(verify_my_vote)
+add_subdirectory(test)

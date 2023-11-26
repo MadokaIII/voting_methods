@@ -9,7 +9,7 @@ file(GLOB MODULES_HEADERS "*.h")
 add_library(modules STATIC ${MODULES_SRC} ${MODULES_HEADERS})
 
 # Link with structures and utils libraries
-target_link_libraries(modules PUBLIC structures utils)
+target_link_libraries(modules PUBLIC structures)
 
 # Specify where to look for header files for this library and its dependencies
 target_include_directories(modules PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

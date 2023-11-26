@@ -4,17 +4,11 @@ project(StructuresTests)
 # Enable testing
 enable_testing()
 
-# Include the directory where structures library headers are located
-include_directories(../../src/structures)
-
-# Include the directory where test_code.h is located
-include_directories(../)
-
 # Collect all test source files
 file(GLOB TEST_SRC "*.c")
 
 # Create a test executable
-add_executable(structures_tests ${TEST_SRC})
+add_executable(structures_tests ${TEST_SRC} test_structure.h)
 
 # Link the test executable with the structures library
 target_link_libraries(structures_tests PRIVATE structures)
