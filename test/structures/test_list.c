@@ -26,7 +26,7 @@ int test_add_and_delete_element(int seed) {
     if (list == NULL)
         return MEMORY_ALLOCATION_ERROR;
 
-    uint addCount = rand() % MAX_TAB; // Add between 1 and MAX_TAB elements
+    uint addCount = rand() % MAX_TAB; // Add between 0 and MAX_TAB - 1 elements
     char candidateName[50];
 
     for (uint i = 0; i < addCount; ++i) {
@@ -124,9 +124,8 @@ int test_list_max_capacity() {
 }
 
 int main(void) {
-    const int totalRuns = 500;
-    const int maxErrorCode = PERMISSION_DENIED_ERROR;   // The highest error code
-    int errorCounts[PERMISSION_DENIED_ERROR + 1] = {0}; // Array to store counts for each error type
+    const int totalRuns = 5000;
+    int errorCount = 0;
     time_t startTime, endTime;
     double timeTaken;
 
@@ -136,23 +135,9 @@ int main(void) {
 
     for (int i = 0; i < totalRuns; ++i) {
         int seed = rand();
-        pid_t pid = fork();
-
-        if (pid == 0) { // Child process
-            int result = test_add_and_delete_element(seed);
-            exit(result);
-        } else if (pid == -1) {
-            perror("fork");
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    for (int i = 0; i < totalRuns; ++i) {
-        int status;
-        wait(&status);
-        int returnedError = WEXITSTATUS(status);
-        if (returnedError > SUCCESS && returnedError <= maxErrorCode) {
-            errorCounts[returnedError]++;
+        int result = test_add_and_delete_element(seed);
+        if (result != SUCCESS) {
+            errorCount++;
         }
     }
 
@@ -160,14 +145,7 @@ int main(void) {
     timeTaken = difftime(endTime, startTime);
 
     printf("Total runs: %d\n", totalRuns);
-    printf("Error Counts by Type:\n");
-    for (int i = SUCCESS; i <= maxErrorCode; ++i) {
-        if (errorCounts[i] > 0) {
-            printf("Error Code %d: %d occurrences\n", i, errorCounts[i]);
-        }
-    }
-
+    printf("Error Counts : %d\n", errorCount);
     printf("Total time taken: %.2f seconds\n", timeTaken);
-
     return 0;
 }

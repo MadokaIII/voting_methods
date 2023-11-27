@@ -141,39 +141,6 @@ uint get_stringbuffer_length(const ptrStringBuffer stringBuffer);
 bool is_empty_stringbuffer(const ptrStringBuffer stringBuffer);
 
 /**
- * @brief Compares two StringBuffers to determine their alphabetical order.
- *
- * This function compares two StringBuffers to check if the first is lexicographically
- * before the second one, considering alphabetical order. The comparison is
- * case-insensitive and skips spaces, newline characters, and null terminators.
- * The function returns true if the first string is in a better alphabetical order
- * compared to the second one, and false otherwise.
- *
- * @param[in] stringBuffer1 The first StringBuffer to compare.
- * @param[in] stringBuffer2 The second StringBuffer to compare.
- *
- * @return
- *   - true if the first string is lexicographically before the second string.
- *   - false if the first string is lexicographically after or equal to the second string.
- *
- * @pre
- *   - Both stringBuffer1 and stringBuffer2 must be valid, non-NULL pointers to initialized
- *     StringBuffers.
- *   - The StringBuffers should contain data to process.
- *
- * @post
- *   - The original content of both StringBuffers remains unchanged.
- *   - The function does not modify the StringBuffers.
- *
- * @note
- *   - The comparison is case-insensitive.
- *   - The function skips spaces, newline characters, and null terminators during comparison.
- *   - If the strings are equal up to the length of the shorter one, the shorter string is
- *     considered to be in a better order.
- */
-bool stringbuffer_compare(const ptrStringBuffer stringBuffer1, const ptrStringBuffer stringBuffer2);
-
-/**
  * @brief Appends a C string to a StringBuffer.
  *
  * This function appends the contents of a C string to the end of the specified StringBuffer.

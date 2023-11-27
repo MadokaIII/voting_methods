@@ -27,7 +27,10 @@ void set_list(ptrList list, StringBuffer candidates[], int votes[], uint size) {
     assert(list != NULL && size < MAX_TAB);
     clear_list(list);
     for (uint i = 0; i < size; i++) {
-        add_element(list, candidates[i], votes[i]);
+        if (votes == NULL)
+            add_element(list, candidates[i], 0);
+        else
+            add_element(list, candidates[i], votes[i]);
     }
     list->size = size;
 }
@@ -37,7 +40,7 @@ void add_element(ptrList list, StringBuffer candidate, int votes) {
 
     uint insertPos = list->size;
     for (uint i = 0; i < list->size; i++) {
-        if (stringbuffer_compare(&candidate, &list->candidates[i])) {
+        if (strncmp(candidate.string, list->candidates[i].string, candidate.size) < 0) {
             insertPos = i;
             break;
         }
@@ -62,11 +65,20 @@ int search_candidate(const ptrList list, const ptrStringBuffer candidate) {
     int right = (int)list->size - 1;
     while (left <= right) {
         int mid = left + (right - left) / 2;
+        if (!list->candidates[mid].string || !candidate->string) {
+            return -1;
+        }
 
-        if (strcmp(list->candidates[mid].string, candidate->string) == 0) {
+        int compareLength = candidate->size < strlen(list->candidates[mid].string)
+                                ? candidate->size
+                                : strlen(list->candidates[mid].string);
+        int comparisonResult =
+            strncmp(candidate->string, list->candidates[mid].string, compareLength);
+
+        if (comparisonResult == 0) {
             return mid;
         }
-        if (stringbuffer_compare(candidate, &list->candidates[mid])) {
+        if (comparisonResult > 0) {
             left = mid + 1;
         } else {
             right = mid - 1;
@@ -113,7 +125,7 @@ ptrStringBuffer list_to_stringbuffer(ptrList list) {
     if (buffer == NULL)
         return NULL;
 
-    char temp[MAX_STRING_SIZE];
+    char temp[50];
     for (uint i = 0; i < list->size; i++) {
         int_to_string(list->votes[i], temp, sizeof(temp));
 
@@ -131,7 +143,7 @@ void clear_list(ptrList list) {
     assert(list != NULL);
     for (uint i = 0; i < list->size; i++)
         delete_stringbuffer_stack(list->candidates[i]);
-    memset(&list->votes, 0, sizeof(int) * MAX_TAB);
+    memset(list->votes, 0, sizeof(int) * MAX_TAB);
     list->size = 0;
 }
 
