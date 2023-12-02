@@ -2,13 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(void) {
+int main(int argc, char **argv) {
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s <Filename> <Number Of Candidates>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    int **data, cols, rows, nb_candidates;
+    if (sscanf(argv[2], "%d", &nb_candidates) != 1) {
+        perror("sscanf failed");
+        exit(EXIT_FAILURE);
+    }
     char **column;
-    int **data;
-    int cols;
-    int rows;
-    fetch_data("/home/madokaiii/voting_methods/votes/VoteCondorcet.csv", &column, &data, &rows,
-               &cols);
+    fetch_data(argv[1], nb_candidates, &column, &data, &rows, &cols);
     for (int i = 0; i < cols; i++) {
         printf(" %s", column[i]);
     }

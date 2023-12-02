@@ -7,55 +7,51 @@
 /*-----------------------------------------------------------------*/
 
 #include "first_past_the_post.h"
-#include "list.h"
+#include "matrix.h"
 #include "miscellaneous.h"
 #include <stdlib.h>
 
 /*-----------------------------------------------------------------*/
 
-void update_data(int **data, int rows, int cols, const int *keep_columns, int keep_size) {
+void update_matrix_data(ptrMatrix matrix, const int *keep_columns, int keep_size) {
+    if (matrix == NULL || matrix->rows == 0 || matrix->columns == 0)
+        return;
 
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
+    for (uint i = 0; i < matrix->rows; i++) {
+        for (uint j = 0; j < matrix->columns; j++) {
             if (!is_column_in_set(j, keep_columns, keep_size)) {
-                data[i][j] = -1;
+                matrix->data[i][j] = -1;
             }
         }
     }
 }
 
-ptrList first_past_the_post_two_round_results(char *csv_votes) {
-    int **data;
-    char **names;
-    int size, rows, cols;
-    List *results = first_past_the_post_one_round_results(csv_votes);
-    int *winners_pos = find_max_positions(results->votes, results->size, &size);
-    fetch_data(csv_votes, &names, &data, &rows, &cols);
-    update_data(data, rows, cols, winners_pos, size);
-    format_votes_with_filter(data, rows, cols);
-    for (int i = 0; i < cols; i++) {
-        set_vote(results, results->candidates[i], 0);
-        for (int j = 0; j < rows; j++) {
-            update_vote(results, results->candidates[i], data[j][i]);
-        }
-    }
-    for (int i = 0; i < cols; i++) {
-        free(names[i]);
-    }
-    int i = 0;
-    while (i < cols) {
-        if (results->votes[i] == 0) {
-            delete_element(results, results->candidates[i]);
-            i--;
-            cols--;
-        }
-        i++;
+ptrMatrix first_past_the_post_two_round_results(char *csv_votes, int nb_candidates) {
+    // Run the first round of voting and get the results in a matrix
+    ptrMatrix results = first_past_the_post_one_round_results(csv_votes, nb_candidates);
+
+    // Check if the first round results were successfully obtained
+    if (results == NULL) {
+        return NULL;
     }
 
+    int size;
+    // Find the positions of winners (top candidates) in the first round
+    int *winners_pos =
+        find_max_positions(results->data[results->rows - 1], results->columns, &size);
+
+    // Update data to keep only winners' columns for the second round
+    set_matrix_from_file(results, csv_votes, nb_candidates);
+    update_matrix_data(results, winners_pos, size);
+
+    // Format the votes for the second round
+    format_votes_with_filter(results, nb_candidates);
+
+    // Calculate the totals for the second round
+    add_totals_row(results);
+
+    // Cleanup
     free(winners_pos);
-    for (int i = 0; i < rows; i++)
-        free(data[i]);
-    free(names);
-    free(data);
+
     return results;
 }

@@ -14,4 +14,4 @@ add_executable(utils_tests ${TEST_SRC})
 target_link_libraries(utils_tests PRIVATE utils)
 
 # Add tests to CTest
-add_test(NAME UtilsTests COMMAND utils_tests)
+add_test(NAME UtilsTests COMMAND utils_tests "/home/madokaiii/voting_methods/votes/VoteCondorcet.csv" 10)

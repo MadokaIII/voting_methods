@@ -6,73 +6,115 @@
  **/
 /*-----------------------------------------------------------------*/
 
-#include "list.h"
+#include "matrix.h"
 #include "miscellaneous.h"
-#include "stringbuffer.h"
 #include <stdlib.h>
 #include <string.h>
 
 /*-----------------------------------------------------------------*/
 
-void format_votes_with_filter(int **data, int rows, int cols) {
-    for (int i = 0; i < rows; i++) {
-        int minVal = min_int(data[i], cols);
+void format_votes_with_filter(ptrMatrix matrix, int nb_candidates) {
+    if (matrix == NULL || matrix->rows == 0 || matrix->columns == 0)
+        return;
+
+    for (uint i = 0; i < matrix->rows; i++) {
+        int minVal = min_int(matrix->data[i], matrix->columns, nb_candidates);
         int minPos = -1;
         int count = 0;
 
         // Count occurrences of minVal and find its position
-        for (int j = 0; j < cols; j++) {
-            if (data[i][j] == minVal) {
+        for (uint j = 0; j < matrix->columns; j++) {
+            if (matrix->data[i][j] == minVal) {
                 count++;
-                minPos = j;
+                if (count == 1) {
+                    minPos = j; // Save the position of the first occurrence
+                }
             }
         }
 
         // Format row based on the count of minVal
         if (count == 1 && minPos != -1) {
             // Set all elements to 0 except the minimum value
-            for (int j = 0; j < cols; j++) {
-                data[i][j] = 0;
+            for (uint j = 0; j < matrix->columns; j++) {
+                matrix->data[i][j] = 0;
             }
-            data[i][minPos] = 1;
+            matrix->data[i][minPos] = 1;
         } else {
             // Set the entire row to 0 if minVal is not unique
-            for (int j = 0; j < cols; j++) {
-                data[i][j] = 0;
+            for (uint j = 0; j < matrix->columns; j++) {
+                matrix->data[i][j] = 0;
             }
         }
     }
 }
 
-ptrList first_past_the_post_one_round_results(char *csv_votes) {
-    List *results = init_list();
-
-    char **names;
-    int **data;
-    int rows, cols, max = 0;
-    fetch_data(csv_votes, &names, &data, &rows, &cols);
-
-    StringBuffer candidates[cols];
-    int *votes = calloc(cols, sizeof(int));
-    format_votes_with_filter(data, rows, cols);
-
-    for (int i = 0; i < cols; i++) {
-        init_stringbuffer_stack(&candidates[i], names[i], strlen(names[i]));
-        for (int j = 0; j < rows; j++)
-            votes[i] += data[j][i];
+int *find_max_positions(const int *array, int size, int *resultSize) {
+    if (size == 0) {
+        *resultSize = 0;
+        return NULL;
     }
 
-    set_list(results, candidates, votes, cols);
+    int max = array[0];
+    int secondMax = 0;
+    int maxCount = 0;
+    int secondMaxCount = 0;
 
-    for (int i = 0; i < cols; i++) {
-        free(names[i]);
-        delete_stringbuffer_stack(candidates[i]);
+    // First pass: Find max and second max values
+    for (int i = 0; i < size; i++) {
+        if (array[i] > max) {
+            secondMax = max;
+            secondMaxCount = maxCount;
+            max = array[i];
+            maxCount = 1;
+        } else if (array[i] == max) {
+            maxCount++;
+        } else if ((array[i] > secondMax && array[i] < max) || secondMax == 0) {
+            secondMax = array[i];
+            secondMaxCount = 1;
+        } else if (array[i] == secondMax) {
+            secondMaxCount++;
+        }
     }
-    for (int i = 0; i < rows; i++)
-        free(data[i]);
-    free(names);
-    free(data);
-    free(votes);
+
+    // Allocate result array
+    *resultSize = (maxCount > 1) ? maxCount : (maxCount + secondMaxCount);
+    int *result = (int *)calloc(*resultSize, sizeof(int));
+    if (!result) {
+        *resultSize = 0;
+        return NULL;
+    }
+
+    // Second pass: Store positions in result array
+    int index = 0;
+    for (int i = 0; i < size; i++) {
+        if ((maxCount == 1 && array[i] == secondMax) || (maxCount > 1 && array[i] == max)) {
+            if (index < *resultSize) {
+                result[index++] = i;
+            }
+        }
+    }
+
+    return result;
+}
+
+ptrMatrix first_past_the_post_one_round_results(char *csv_votes, int nb_candidates) {
+    // Initialize the matrix from the file
+    ptrMatrix results = init_matrix();
+    set_matrix_from_file(results, csv_votes, nb_candidates);
+
+    // Check if matrix initialization was successful
+    if (results == NULL) {
+        return NULL;
+    }
+
+    // Format the votes
+    format_votes_with_filter(results, nb_candidates);
+
+    // Add a new row for totals
+    results->rows += 1;
+
+    // Calculate totals and add them as the last row
+    add_totals_row(results);
 
     return results;
 }

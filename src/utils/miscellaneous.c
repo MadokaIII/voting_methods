@@ -12,6 +12,7 @@
 /*-----------------------------------------------------------------*/
 
 #include "miscellaneous.h"
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,17 +30,24 @@ void generate_random_string(char *str, int length) {
     str[length - 1] = '\0';
 }
 
-bool is_data_column(const char *token) {
-    const char *valid_tokens[] = {"-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-    for (unsigned long i = 0; i < sizeof(valid_tokens) / sizeof(valid_tokens[0]); i++) {
-        if (strcmp(token, valid_tokens[i]) == 0) {
+bool is_data_column(const char *token, int num_candidates) {
+    // Handle special case for "-1"
+    if (strcmp(token, "-1") == 0) {
+        return true;
+    }
+
+    // Check if token is within 0 to num_candidates
+    char buffer[20]; // Buffer for string conversion
+    for (int i = 0; i <= num_candidates; i++) {
+        sprintf(buffer, "%d", i); // Convert integer to string
+        if (strcmp(token, buffer) == 0) {
             return true;
         }
     }
     return false;
 }
 
-int get_start_pos(FILE *file) {
+int get_start_pos(FILE *file, int nb_candidates) {
     char line[1024];
     int start_pos = -1;
 
@@ -53,7 +61,7 @@ int get_start_pos(FILE *file) {
         char *token = strtok(line, ",");
         int colIndex = 0;
         while (token != NULL) {
-            if (is_data_column(token)) {
+            if (is_data_column(token, nb_candidates)) {
                 start_pos = colIndex;
                 break;
             }
@@ -65,6 +73,19 @@ int get_start_pos(FILE *file) {
 
     fseek(file, 0, SEEK_SET);
     return start_pos;
+}
+
+bool is_special_format(const char *token) {
+    // Check for "Q00_Vote->" at the beginning
+    if (strncmp(token, "Q00_Vote->", 10) == 0) {
+        int i = 10; // Start checking after "Q00_Vote->"
+
+        // Check if there are one or more digits followed by " - "
+        while (isdigit(token[i]))
+            i++;
+        return strncmp(&token[i], " - ", 3) == 0;
+    }
+    return false;
 }
 
 void get_column_names(FILE *file, char ***columns_name, int *cols, int start_pos) {
@@ -90,6 +111,11 @@ void get_column_names(FILE *file, char ***columns_name, int *cols, int start_pos
         token = strtok(line, ",");
         for (int i = 0; i < start_pos + *cols; ++i) {
             if (i >= start_pos) {
+                // Apply special format handling only if token matches specific pattern
+                if (is_special_format(token)) {
+                    token = strstr(token, " - ") + 3; // Skip to the name part
+                }
+
                 // Trim newline character if present
                 size_t len = strlen(token);
                 if (len > 0 && token[len - 1] == '\n') {
@@ -103,14 +129,15 @@ void get_column_names(FILE *file, char ***columns_name, int *cols, int start_pos
     }
 }
 
-void fetch_data(const char *csvpath, char ***columns_name, int ***data, int *rows, int *cols) {
+void fetch_data(const char *csvpath, int nb_candidates, char ***columns_name, int ***data,
+                int *rows, int *cols) {
     FILE *file = fopen(csvpath, "r");
     if (file == NULL) {
         perror("Error opening file");
         return;
     }
 
-    int start_pos = get_start_pos(file);
+    int start_pos = get_start_pos(file, nb_candidates);
     if (start_pos == -1) {
         printf("Error determining start position.\n");
         fclose(file);
@@ -154,62 +181,13 @@ void fetch_data(const char *csvpath, char ***columns_name, int ***data, int *row
     fclose(file);
 }
 
-int min_int(int *array, int size) {
-    int min = 10;
+int min_int(int *array, int size, int nb_candidates) {
+    int min = nb_candidates + 1;
     for (int i = 0; i < size; i++) {
         if (array[i] != -1)
             min = array[i] < min ? array[i] : min;
     }
     return min;
-}
-
-int *find_max_positions(const int *array, int size, int *resultSize) {
-    if (size == 0) {
-        *resultSize = 0;
-        return NULL;
-    }
-
-    int max = array[0];
-    int secondMax = 0;
-    int maxCount = 0;
-    int secondMaxCount = 0;
-
-    // First pass: Find max and second max values
-    for (int i = 0; i < size; i++) {
-        if (array[i] > max) {
-            secondMax = max;
-            secondMaxCount = maxCount;
-            max = array[i];
-            maxCount = 1;
-        } else if (array[i] == max) {
-            maxCount++;
-        } else if ((array[i] > secondMax && array[i] < max) || secondMax == 0) {
-            secondMax = array[i];
-            secondMaxCount = 1;
-        } else if (array[i] == secondMax) {
-            secondMaxCount++;
-        }
-    }
-
-    // Allocate result array
-    *resultSize = (maxCount > 1) ? maxCount : (maxCount + secondMaxCount);
-    int *result = (int *)calloc(*resultSize, sizeof(int));
-    if (!result) {
-        *resultSize = 0;
-        return NULL;
-    }
-
-    // Second pass: Store positions in result array
-    int index = 0;
-    for (int i = 0; i < size; i++) {
-        if ((maxCount == 1 && array[i] == secondMax) || (maxCount > 1 && array[i] == max)) {
-            if (index < *resultSize) {
-                result[index++] = i;
-            }
-        }
-    }
-
-    return result;
 }
 
 bool is_column_in_set(int col, const int *set, int set_size) {

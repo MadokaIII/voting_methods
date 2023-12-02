@@ -1,25 +1,15 @@
 #ifndef TEST_CODE_H
 #define TEST_CODE_H
 
+#include "matrix.h"
+#include "miscellaneous.h"
+#include "stringbuffer.h"
+
 // General errors
 #define SUCCESS 0
 #define FAILURE 1
 #define MEMORY_ALLOCATION_ERROR 2
 #define NULL_POINTER_ERROR 3
-
-// List-specific errors
-#define LIST_INIT_ERROR 10
-#define LIST_ADD_ERROR 11
-#define LIST_SEARCH_ERROR 12
-#define LIST_DELETE_ERROR 13
-#define LIST_UPDATE_ERROR 14
-#define LIST_SET_ERROR 15
-#define LIST_OVERFLOW_ERROR 16
-#define LIST_UNDERFLOW_ERROR 17
-#define LIST_MAX_CAPACITY_ERROR 18
-#define LIST_CLEAR_ERROR 19
-#define LIST_TO_STRINGBUFFER_ERROR 20
-#define LIST_VOTE_ERROR 21
 
 // Matrix-specific errors
 #define MATRIX_INIT_ERROR 30

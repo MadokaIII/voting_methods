@@ -7,6 +7,7 @@
 /*-----------------------------------------------------------------*/
 
 #include "stringbuffer.h"
+#include "miscellaneous.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -100,11 +101,16 @@ void clear_stringbuffer(ptrStringBuffer stringBuffer) {
     stringBuffer->size = 0;
 }
 
-void print_stringbuffer(const ptrStringBuffer stringBuffer, uint outputType) {
+void print_stringbuffer(const ptrStringBuffer stringBuffer, uint outputType,
+                        const char *separator) {
     assert(stringBuffer != NULL);
     switch (outputType) {
     case STDOUT:
-        printf("%.*s\n", stringBuffer->size, stringBuffer->string);
+        printf("%*.s\n", stringBuffer->size, stringBuffer->string);
+        break;
+    case STDOUT_AS_LIST:
+        printf("%s%-*.*s%s", separator, stringBuffer->size, stringBuffer->size,
+               stringBuffer->string, separator);
         break;
     default:
         break;
