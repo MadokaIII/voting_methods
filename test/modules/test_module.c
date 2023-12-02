@@ -27,13 +27,15 @@ void print_results(List *results) {
     printf("\n==============================================================\n");
 }
 
-int main(void) {
-    int *pos;
-    int size;
+int main(int argc, char **argv) {
+    if (argc != 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+    int *pos, size;
 
     // First round results
-    List *results = first_past_the_post_one_round_results(
-        "/home/madokaiii/voting_methods/votes/VoteCondorcet.csv");
+    List *results = first_past_the_post_one_round_results(argv[1]);
     StringBuffer *sb = list_to_stringbuffer(results);
 
     print_results(results);
@@ -49,8 +51,7 @@ int main(void) {
     delete_list(results);
 
     // Second round results
-    results = first_past_the_post_two_round_results(
-        "/home/madokaiii/voting_methods/votes/VoteCondorcet.csv");
+    results = first_past_the_post_two_round_results(argv[1]);
     sb = list_to_stringbuffer(results);
 
     print_results(results);
