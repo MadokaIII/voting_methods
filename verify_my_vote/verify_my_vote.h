@@ -9,12 +9,7 @@
 #ifndef VERIFY_MY_VOTE_H
 #define VERIFY_MY_VOTE_H
 
-#include "sha256.h"
-#include "sha256_utils.h"
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 // Constant definition
 #define ERROR_INDENT "\033[31m ✗\033[0m  "
@@ -36,8 +31,8 @@
  *
  * @section intro_sec Introduction
  *
- * Welcome to the Vote Verifier project. This program allows you to verify your vote by
- * providing some basic information.
+ * Welcome to the Vote Verifier project. This program allows you to verify your
+ * vote by providing some basic information.
  *
  * @section usage_sec Usage
  *
@@ -65,7 +60,8 @@
  *
  * @param argc The number of command-line arguments.
  * @param argv The array of command-line arguments.
- * @return 0 on success, exits with an error message if the wrong number of arguments is provided.
+ * @return 0 on success, exits with an error message if the wrong number of
+ *         arguments is provided.
  */
 int main(int argc, const char *argv[]);
 
@@ -114,7 +110,8 @@ void capitalizeAll(char *str);
  * @param[in] firstName The user's first name.
  * @param[out] concatenated The buffer to store the concatenated string.
  */
-void concatenate(char *key, char *lastName, char *firstName, char *concatenated);
+void concatenate(char *key, char *lastName, char *firstName,
+                 char *concatenated);
 
 /** @} */ // End of StringProcessing group
 
@@ -141,8 +138,8 @@ void calculateHash(const char *concatenated, char *hashResult);
  * @brief Searches for a vote in a file.
  * @param[in] hashResult The hash to search for.
  * @param[in] filename The name of the file to search.
- * @return A SearchResult struct containing the first line and the line with the votes, or NULL if
- * not found.
+ * @return A SearchResult struct containing the first line and the line with the
+ *         votes, or NULL if not found.
  */
 SearchResult *searchVote(const char *hashResult, const char *filename);
 

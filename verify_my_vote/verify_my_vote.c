@@ -32,13 +32,14 @@ void print_prompt(const char *message) {
 int main(int argc, const char *argv[]) {
 
     printf(ANSI_COLOR_BLUE
-           "╔══════════════════════════════════════════════════════════╗\n"
-           "║                                                          ║\n"
-           "║         Welcome to the Vote Verifier                     ║\n"
-           "║   This program allows you to verify your vote by         ║\n"
-           "║         providing some basic information.                ║\n"
-           "║                                                          ║\n"
-           "╚══════════════════════════════════════════════════════════╝\n\n\n" ANSI_COLOR_RESET);
+           "╔════════════════════════════════════════════════════╗\n"
+           "║                                                    ║\n"
+           "║            Welcome to the Vote Verifier            ║\n"
+           "║   This program allows you to verify your vote by   ║\n"
+           "║             calculating your hash key.             ║\n"
+           "║                                                    ║\n"
+           "╚════════════════════════════════════════════════════╝\n\n"
+           "\n" ANSI_COLOR_RESET);
 
     if (argc != 2) {
         print_error("Usage: %s <vote file>\n", argv[0], NULL);
@@ -111,7 +112,8 @@ void capitalizeAll(char *str) {
     }
 }
 
-void concatenate(char *key, char *lastName, char *firstName, char *concatenated) {
+void concatenate(char *key, char *lastName, char *firstName,
+                 char *concatenated) {
     strncpy(concatenated, lastName, strnlen(lastName, STRLONG));
     strncat(concatenated, " ", 2);
     strncat(concatenated, firstName, strnlen(firstName, STRLONG));
@@ -120,8 +122,8 @@ void concatenate(char *key, char *lastName, char *firstName, char *concatenated)
 
 void calculateHash(const char *concatenated, char *hashResult) {
     sha256ofString((BYTE *)concatenated, hashResult);
-    printf("%sHash: %s %s %s\n\n", ANSI_COLOR_BLUE, ANSI_COLOR_YELLOW, hashResult,
-           ANSI_COLOR_RESET);
+    printf("%sHash: %s %s %s\n\n", ANSI_COLOR_BLUE, ANSI_COLOR_YELLOW,
+           hashResult, ANSI_COLOR_RESET);
 }
 
 SearchResult *searchVote(const char *hashResult, const char *filename) {
@@ -219,8 +221,10 @@ void formatResult(SearchResult *results) {
         exit(EXIT_FAILURE);
     }
 
-    printf(ANSI_COLOR_BLUE "╔═════════════════════════════════════════════════════════════════════"
-                           "════════════════════════════════╗\n");
+    printf(
+        ANSI_COLOR_BLUE
+        "╔═════════════════════════════════════════════════════════════════════"
+        "════════════════════════════════╗\n");
     printf("║                                     Résultats du vote           "
            "                                    ║\n");
     printf("╟───────────────────────────────────────────────────────────────"
@@ -242,15 +246,18 @@ void formatResult(SearchResult *results) {
             burger_name = header_token;
         }
         if (i < 2) {
-            printf(ANSI_COLOR_BLUE "║ %-21s -> " ANSI_COLOR_YELLOW "%-75s" ANSI_COLOR_BLUE
+            printf(ANSI_COLOR_BLUE "║ %-21s -> " ANSI_COLOR_YELLOW
+                                   "%-75s" ANSI_COLOR_BLUE
                                    " ║\n" ANSI_COLOR_RESET,
                    burger_name, value_token);
         } else if (i == 2) {
-            printf(ANSI_COLOR_BLUE "║ %-20s -> " ANSI_COLOR_YELLOW "%-76s" ANSI_COLOR_BLUE
+            printf(ANSI_COLOR_BLUE "║ %-20s -> " ANSI_COLOR_YELLOW
+                                   "%-76s" ANSI_COLOR_BLUE
                                    " ║\n" ANSI_COLOR_RESET,
                    burger_name, value_token);
         } else {
-            printf(ANSI_COLOR_BLUE "║ %-20s -> " ANSI_COLOR_YELLOW "%-75s" ANSI_COLOR_BLUE
+            printf(ANSI_COLOR_BLUE "║ %-20s -> " ANSI_COLOR_YELLOW
+                                   "%-75s" ANSI_COLOR_BLUE
                                    " ║\n" ANSI_COLOR_RESET,
                    burger_name, value_token);
         }
@@ -260,8 +267,9 @@ void formatResult(SearchResult *results) {
         i++;
     }
 
-    printf(ANSI_COLOR_BLUE "╚══════════════════════════════════════════════════════════════════"
-                           "═══════════════════════════════════╝\n" ANSI_COLOR_RESET);
+    printf(ANSI_COLOR_BLUE
+           "╚══════════════════════════════════════════════════════════════════"
+           "═══════════════════════════════════╝\n" ANSI_COLOR_RESET);
 
     // Free the duplicated strings
     free(headers);

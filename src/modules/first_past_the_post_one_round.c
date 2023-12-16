@@ -87,7 +87,8 @@ int *find_max_positions(const int *array, int size, int *resultSize) {
     // Second pass: Store positions in result array
     int index = 0;
     for (int i = 0; i < size; i++) {
-        if ((maxCount == 1 && array[i] == secondMax) || (maxCount > 1 && array[i] == max)) {
+        if ((maxCount == 1 && array[i] == secondMax) ||
+            (maxCount > 1 && array[i] == max)) {
             if (index < *resultSize) {
                 result[index++] = i;
             }
@@ -97,9 +98,10 @@ int *find_max_positions(const int *array, int size, int *resultSize) {
     return result;
 }
 
-ptrMatrix first_past_the_post_one_round_results(char *csv_votes, int nb_candidates) {
+ptrMatrix first_past_the_post_one_round_results(char *csv_votes,
+                                                int nb_candidates) {
     // Initialize the matrix from the file
-    ptrMatrix results = init_matrix();
+    ptrMatrix results = init_matrix(false);
     set_matrix_from_file(results, csv_votes, nb_candidates);
 
     // Check if matrix initialization was successful

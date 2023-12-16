@@ -19,7 +19,9 @@
 
 /*-----------------------------------------------------------------*/
 
-void int_to_string(int value, char *str, int max_len) { snprintf(str, max_len, "%d", value); }
+void int_to_string(int value, char *str, int max_len) {
+    snprintf(str, max_len, "%d", value);
+}
 
 void generate_random_string(char *str, int length) {
     char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
@@ -88,7 +90,8 @@ bool is_special_format(const char *token) {
     return false;
 }
 
-void get_column_names(FILE *file, char ***columns_name, int *cols, int start_pos) {
+void get_column_names(FILE *file, char ***columns_name, int *cols,
+                      int start_pos) {
     char line[1024];
 
     // Read first line to get column names
@@ -105,13 +108,15 @@ void get_column_names(FILE *file, char ***columns_name, int *cols, int start_pos
 
         // Allocate memory for columns_name array
         *columns_name = calloc(*cols, sizeof(char *));
-        fseek(file, 0, SEEK_SET);        // Reset file pointer to beginning
-        fgets(line, sizeof(line), file); // Read first line again for column names
+        fseek(file, 0, SEEK_SET); // Reset file pointer to beginning
+        fgets(line, sizeof(line),
+              file); // Read first line again for column names
 
         token = strtok(line, ",");
         for (int i = 0; i < start_pos + *cols; ++i) {
             if (i >= start_pos) {
-                // Apply special format handling only if token matches specific pattern
+                // Apply special format handling only if token matches specific
+                // pattern
                 if (is_special_format(token)) {
                     token = strstr(token, " - ") + 3; // Skip to the name part
                 }
@@ -129,8 +134,8 @@ void get_column_names(FILE *file, char ***columns_name, int *cols, int start_pos
     }
 }
 
-void fetch_data(const char *csvpath, int nb_candidates, char ***columns_name, int ***data,
-                int *rows, int *cols) {
+void fetch_data(const char *csvpath, int nb_candidates, char ***columns_name,
+                int ***data, int *rows, int *cols) {
     FILE *file = fopen(csvpath, "r");
     if (file == NULL) {
         perror("Error opening file");
@@ -197,4 +202,8 @@ bool is_column_in_set(int col, const int *set, int set_size) {
         }
     }
     return false;
+}
+
+bool has_better_score(int first, int second, int max) {
+    return (first != second && first != -1 && first < second);
 }

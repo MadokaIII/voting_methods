@@ -28,6 +28,7 @@ typedef struct s_matrix {
     int data[MAX_TAB][MAX_TAB];  /**< The data of the matrix */
     uint columns;                /**< The number of columns of the matrix */
     uint rows;                   /**< The number of rows of the matrix */
+    bool is_duel;
 } Matrix;
 
 /**
@@ -38,21 +39,25 @@ typedef Matrix *ptrMatrix;
 /**
  * @brief Creates a new matrix.
  *
- * Allocates memory for a new Matrix structure and initializes the matrix with zero rows and
- * columns. The matrix is ready to have data and tags added to it after initialization.
+ * Allocates memory for a new Matrix structure and initializes the matrix with
+ * zero rows and columns. The matrix is ready to have data and tags added to it
+ * after initialization.
  *
- * @return A pointer to the newly allocated Matrix, or NULL if memory allocation fails.
+ * @return A pointer to the newly allocated Matrix, or NULL if memory allocation
+ * fails.
  *
- * @post The returned Matrix must be freed by the caller using delete_matrix to avoid memory leaks.
+ * @post The returned Matrix must be freed by the caller using delete_matrix to
+ * avoid memory leaks.
  */
-ptrMatrix init_matrix(void);
+ptrMatrix init_matrix(bool is_duel);
 
 /**
  * @brief Sets a matrix with data from a CSV file.
  *
- * Reads voting data from a CSV file and populates the matrix with this data. The function
- * also initializes the column names in the matrix based on the CSV file headers. The number
- * of candidates (`nb_candidates`) helps in determining the structure of the matrix.
+ * Reads voting data from a CSV file and populates the matrix with this data.
+ * The function also initializes the column names in the matrix based on the CSV
+ * file headers. The number of candidates (`nb_candidates`) helps in determining
+ * the structure of the matrix.
  *
  * @param[in,out] matrix The matrix to be set with data.
  * @param[in] filename Path to the CSV file containing voting data.
@@ -69,12 +74,14 @@ ptrMatrix init_matrix(void);
  */
 void set_matrix_from_file(ptrMatrix matrix, char *filename, int nb_candidates);
 
+void set_duel_from_file(ptrMatrix duel, char *filename, int nb_candidates);
+
 /**
  * @brief Adds a totals row to a matrix.
  *
- * Calculates the total for each column in the matrix and adds a new row at the bottom
- * with these totals. This function is commonly used for summing up vote counts or similar
- * data in a matrix.
+ * Calculates the total for each column in the matrix and adds a new row at the
+ * bottom with these totals. This function is commonly used for summing up vote
+ * counts or similar data in a matrix.
  *
  * @param[in,out] matrix The matrix to which the totals row will be added.
  *
@@ -88,12 +95,13 @@ void set_matrix_from_file(ptrMatrix matrix, char *filename, int nb_candidates);
 void add_totals_row(ptrMatrix matrix);
 
 /**
- * @brief Prints the contents of a matrix along with its column names, using a specified separator.
+ * @brief Prints the contents of a matrix along with its column names, using a
+ * specified separator.
  *
- * This function prints the column names and the data of a matrix in a tabular format.
- * It uses a specified separator to delineate columns. This function is designed to
- * provide a clear and formatted display of matrix data, which is helpful for
- * debugging and presentation purposes in console applications.
+ * This function prints the column names and the data of a matrix in a tabular
+ * format. It uses a specified separator to delineate columns. This function is
+ * designed to provide a clear and formatted display of matrix data, which is
+ * helpful for debugging and presentation purposes in console applications.
  *
  * @param[in] matrix The matrix to be printed.
  * @param[in] separator The string to be used as a separator between columns.
@@ -108,8 +116,9 @@ void print_matrix(ptrMatrix matrix, const char *separator);
 /**
  * @brief Clears the data from a Matrix.
  *
- * This function clears the data from a Matrix, but does not free the Matrix itself.
- * The function resets the `tags` and `data` arrays within the Matrix to their initial state.
+ * This function clears the data from a Matrix, but does not free the Matrix
+ * itself. The function resets the `tags` and `data` arrays within the Matrix to
+ * their initial state.
  *
  * @param[in,out] matrix The Matrix to clear.
  *
@@ -121,8 +130,8 @@ void clear_matrix(ptrMatrix matrix);
 /**
  * @brief Frees the memory allocated for a Matrix.
  *
- * This function frees the memory allocated for a Matrix, including its internal structures.
- * After calling this function, the matrix pointer will be invalid.
+ * This function frees the memory allocated for a Matrix, including its internal
+ * structures. After calling this function, the matrix pointer will be invalid.
  *
  * @param[in] matrix The Matrix to free.
  *

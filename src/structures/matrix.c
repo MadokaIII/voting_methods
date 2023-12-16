@@ -16,10 +16,11 @@
 
 /*-----------------------------------------------------------------*/
 
-ptrMatrix init_matrix(void) {
+ptrMatrix init_matrix(bool is_duel) {
     ptrMatrix matrix = malloc(sizeof(Matrix));
     if (matrix == NULL)
         return NULL;
+    matrix->is_duel = is_duel;
     matrix->columns = 0;
     matrix->rows = 0;
     return matrix;
@@ -35,8 +36,8 @@ void set_matrix_from_file(ptrMatrix matrix, char *filename, int nb_candidates) {
     matrix->columns = cols;
     matrix->rows = rows;
     for (int i = 0; i < cols; ++i) {
-        matrix->tags[i] = init_stringbuffer(NULL, 0);
-        append_string(matrix->tags[i], columns_name[i], strlen(columns_name[i]));
+        matrix->tags[i] =
+            init_stringbuffer(columns_name[i], strlen(columns_name[i]));
     }
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; j++) {
@@ -51,8 +52,39 @@ void set_matrix_from_file(ptrMatrix matrix, char *filename, int nb_candidates) {
     free(data);
 }
 
+int duel_matrix(ptrMatrix ballot, int first, int second, int nb_candidates) {
+    int score = 0;
+    for (uint i = 0; i < ballot->rows; i++) {
+        score += has_better_score(first, second, nb_candidates) ? 1 : 0;
+    }
+    return score;
+}
+
+void set_duel_from_file(ptrMatrix duel, char *filename, int nb_candidates) {
+    if (filename == NULL || nb_candidates <= 0)
+        return;
+    Matrix ballot;
+    set_matrix_from_file(&ballot, filename, nb_candidates);
+    for (int i = 0; i < nb_candidates; i++) {
+        duel->tags[i] =
+            init_stringbuffer(ballot.tags[i]->string, ballot.tags[i]->size);
+        for (int j = 0; j < nb_candidates; j++) {
+            if (i == j) {
+                duel->data[i][j] = 0;
+            } else {
+                duel->data[i][j] = duel_matrix(&ballot, i, j, nb_candidates);
+            }
+        }
+    }
+    duel->rows = duel->columns = nb_candidates;
+    for (uint i = 0; i < ballot.columns; i++) {
+        delete_stringbuffer(ballot.tags[i]);
+    }
+}
+
 void add_row(ptrMatrix matrix, int row[], uint size) {
-    if (matrix == NULL || row == NULL || matrix->rows + 1 >= MAX_TAB || size >= MAX_TAB)
+    if (matrix == NULL || matrix->is_duel || row == NULL ||
+        matrix->rows + 1 >= MAX_TAB || size >= MAX_TAB)
         return;
     if (matrix->columns == 0) {
         matrix->columns = size;
@@ -68,8 +100,8 @@ void add_row(ptrMatrix matrix, int row[], uint size) {
 }
 
 void add_column(ptrMatrix matrix, const char *tag, int column[], uint size) {
-    if (matrix == NULL || tag == NULL || column == NULL || matrix->columns + 1 >= MAX_TAB ||
-        size >= MAX_TAB)
+    if (matrix == NULL || matrix->is_duel || tag == NULL || column == NULL ||
+        matrix->columns + 1 >= MAX_TAB || size >= MAX_TAB)
         return;
     if (matrix->rows == 0) {
         matrix->rows = size;
@@ -86,7 +118,8 @@ void add_column(ptrMatrix matrix, const char *tag, int column[], uint size) {
 }
 
 void add_totals_row(ptrMatrix matrix) {
-    if (matrix == NULL || matrix->columns == 0 || matrix->rows == 0)
+    if (matrix == NULL || matrix->is_duel || matrix->columns == 0 ||
+        matrix->rows == 0)
         return;
     matrix->rows++;
     for (uint j = 0; j < matrix->columns; ++j) {
@@ -111,6 +144,10 @@ void print_matrix(ptrMatrix matrix, const char *separator) {
 
     // Print matrix data, center-aligned within the column width
     for (uint i = 0; i < matrix->rows; ++i) {
+        if (matrix->is_duel) {
+            print_stringbuffer(matrix->tags[i], STDOUT_AS_LIST, separator);
+            printf("    ");
+        }
         for (uint j = 0; j < matrix->columns; ++j) {
             int numDigits = snprintf(NULL, 0, "%d", matrix->data[i][j]);
             int colWidth = matrix->tags[j]->size;
@@ -118,8 +155,8 @@ void print_matrix(ptrMatrix matrix, const char *separator) {
             int rightPadding = ceil((colWidth - numDigits) / 2.0);
 
             // Print left padding, data, and right padding
-            printf("%s%*s%d%*s%s", separator, leftPadding, "", matrix->data[i][j], rightPadding, "",
-                   separator);
+            printf("%s%*s%d%*s%s", separator, leftPadding, "",
+                   matrix->data[i][j], rightPadding, "", separator);
             printf("    ");
         }
         printf("\n");

@@ -38,7 +38,8 @@ ptrStringBuffer init_stringbuffer(const char *initialString, uint size) {
     return sb;
 }
 
-void init_stringbuffer_stack(ptrStringBuffer stringBuffer, const char *initialString, uint size) {
+void init_stringbuffer_stack(ptrStringBuffer stringBuffer,
+                             const char *initialString, uint size) {
     assert(stringBuffer != NULL);
     assert(size < MAX_STRING_SIZE);
 
@@ -55,16 +56,21 @@ void init_stringbuffer_stack(ptrStringBuffer stringBuffer, const char *initialSt
     }
 }
 
-uint get_stringbuffer_length(const ptrStringBuffer stringBuffer) { return stringBuffer->size; }
+uint get_stringbuffer_length(const ptrStringBuffer stringBuffer) {
+    return stringBuffer->size;
+}
 
-bool is_empty_stringbuffer(const ptrStringBuffer stringBuffer) { return !stringBuffer->size; }
+bool is_empty_stringbuffer(const ptrStringBuffer stringBuffer) {
+    return !stringBuffer->size;
+}
 
 int append_string(ptrStringBuffer stringBuffer, const char *str, uint size) {
     assert(stringBuffer != NULL);
     if (str == NULL || stringBuffer->size + size >= MAX_STRING_SIZE) {
         return -1;
     }
-    char *temp = realloc(stringBuffer->string, (stringBuffer->size + size + 1) * sizeof(char));
+    char *temp = realloc(stringBuffer->string,
+                         (stringBuffer->size + size + 1) * sizeof(char));
     if (temp == NULL)
         return -1;
     stringBuffer->string = temp;
@@ -81,7 +87,8 @@ int append_stringbuffer(ptrStringBuffer target, const ptrStringBuffer source) {
     assert(target != NULL && source != NULL);
     if (source->size + target->size >= MAX_STRING_SIZE)
         return -1;
-    char *temp = realloc(target->string, (target->size + source->size + 1) * sizeof(char));
+    char *temp = realloc(target->string,
+                         (target->size + source->size + 1) * sizeof(char));
     if (temp == NULL)
         return -1;
     target->string = temp;
