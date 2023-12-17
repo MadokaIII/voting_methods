@@ -2,7 +2,7 @@
 /** Advanced Project
  *  @author LAMALMI Daoud
  *  @date 26/11/2023
- *  @file Implementation for the condorcet methods wit Minimax Resolution
+ *  @file Implementation for the condorcet methods with Minimax Resolution
  **/
 /*-----------------------------------------------------------------*/
 

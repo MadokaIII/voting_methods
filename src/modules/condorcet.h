@@ -13,4 +13,6 @@
 
 /*-----------------------------------------------------------------*/
 
+bool condorcet_winner(char *csv, int nb_candidates, Matrix *duel, int *winner);
+
 #endif // CONDORCET_H

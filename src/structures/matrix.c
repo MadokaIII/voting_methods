@@ -11,6 +11,7 @@
 #include "stringbuffer.h"
 #include <math.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -63,22 +64,21 @@ int duel_matrix(ptrMatrix ballot, int first, int second, int nb_candidates) {
 void set_duel_from_file(ptrMatrix duel, char *filename, int nb_candidates) {
     if (filename == NULL || nb_candidates <= 0)
         return;
-    Matrix ballot;
-    set_matrix_from_file(&ballot, filename, nb_candidates);
+    Matrix *ballot = init_matrix(false);
+    set_matrix_from_file(ballot, filename, nb_candidates);
     for (int i = 0; i < nb_candidates; i++) {
-        duel->tags[i] =
-            init_stringbuffer(ballot.tags[i]->string, ballot.tags[i]->size);
+        memcpy(&duel->tags[i], &ballot->tags[i], sizeof(StringBuffer));
         for (int j = 0; j < nb_candidates; j++) {
             if (i == j) {
                 duel->data[i][j] = 0;
             } else {
-                duel->data[i][j] = duel_matrix(&ballot, i, j, nb_candidates);
+                duel->data[i][j] = duel_matrix(ballot, i, j, nb_candidates);
             }
         }
     }
     duel->rows = duel->columns = nb_candidates;
-    for (uint i = 0; i < ballot.columns; i++) {
-        delete_stringbuffer(ballot.tags[i]);
+    for (uint i = 0; i < ballot->columns; i++) {
+        delete_stringbuffer(ballot->tags[i]);
     }
 }
 

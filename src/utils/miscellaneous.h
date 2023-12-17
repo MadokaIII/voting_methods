@@ -50,7 +50,9 @@ typedef unsigned int uint;
  * @param[in] max_len The maximum length of the buffer, including space for the
  *                    null terminator.
  *
- * @pre
+ * @preif (max(results, nb_candidates) == -1) {
+        return false;
+    }
  *   - str must be a valid, non-NULL pointer to a character array.
  *   - max_len must be sufficiently large to store the integer value and null
  *     terminator.
@@ -291,6 +293,8 @@ int min_int(int *array, int size, int nb_candidates);
 bool is_column_in_set(int col, const int *set, int set_size);
 
 bool has_better_score(int first, int second, int max);
+
+int max(int *array, int size);
 
 /** @} */ // End of Miscellaneous group
 
