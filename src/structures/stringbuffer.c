@@ -21,6 +21,7 @@ ptrStringBuffer init_stringbuffer(const char *initialString, uint size) {
     if (sb == NULL) {
         return NULL;
     }
+
     sb->string = calloc(size + 1, sizeof(char));
     if (sb->string == NULL) {
         delete_stringbuffer(sb);
@@ -30,8 +31,7 @@ ptrStringBuffer init_stringbuffer(const char *initialString, uint size) {
     sb->size = 0;
     if (initialString != NULL) {
         for (uint i = 0; i < size && initialString[i] != '\0'; i++) {
-            sb->string[i] = initialString[i];
-            sb->size++;
+            sb->string[sb->size++] = initialString[i];
         }
         sb->string[sb->size] = '\0';
     }
@@ -113,11 +113,11 @@ void print_stringbuffer(const ptrStringBuffer stringBuffer, uint outputType,
     assert(stringBuffer != NULL);
     switch (outputType) {
     case STDOUT:
-        printf("%*.s\n", stringBuffer->size, stringBuffer->string);
+        printf("%*s\n", stringBuffer->size, stringBuffer->string);
         break;
     case STDOUT_AS_LIST:
-        printf("%s%-*.*s%s", separator, stringBuffer->size, stringBuffer->size,
-               stringBuffer->string, separator);
+        printf("%s%*s%s", separator, stringBuffer->size, stringBuffer->string,
+               separator);
         break;
     default:
         break;

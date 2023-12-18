@@ -10,6 +10,7 @@
 #define MISCELLANEOUS_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 
 /*-----------------------------------------------------------------*/
@@ -295,6 +296,8 @@ bool is_column_in_set(int col, const int *set, int set_size);
 bool has_better_score(int first, int second, int max);
 
 int max(int *array, int size);
+
+unsigned calculate_visual_length(const char *str);
 
 /** @} */ // End of Miscellaneous group
 

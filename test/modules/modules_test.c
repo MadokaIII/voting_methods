@@ -34,9 +34,8 @@ int main(int argc, char **argv) {
     int winner;
     bool hasWinner = find_condorcet_winner(matrix, nb_candidates, &winner);
     if (hasWinner) {
-        printf("Condorcet winner is candidate ");
-        print_stringbuffer(matrix->tags[winner], STDOUT, "");
-        fflush(stdout);
+        printf("Condorcet winner is candidate : ");
+        print_stringbuffer(matrix->tags[winner], STDOUT, " ");
     } else {
         printf("No Condorcet winner found.\n");
     }

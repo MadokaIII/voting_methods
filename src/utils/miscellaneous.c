@@ -13,6 +13,7 @@
 
 #include "miscellaneous.h"
 #include <ctype.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -64,8 +65,10 @@ int get_start_pos(FILE *file, int nb_candidates) {
         int colIndex = 0;
         while (token != NULL) {
             if (is_data_column(token, nb_candidates)) {
-                start_pos = colIndex;
-                break;
+                if (start_pos != -1)
+                    break;
+                else
+                    start_pos = colIndex;
             }
 
             colIndex++;
@@ -121,13 +124,16 @@ void get_column_names(FILE *file, char ***columns_name, int *cols,
                     token = strstr(token, " - ") + 3; // Skip to the name part
                 }
 
-                // Trim newline character if present
-                size_t len = strlen(token);
-                if (len > 0 && token[len - 1] == '\n') {
-                    token[len - 1] = '\0';
-                }
+                // Trim leading and trailing spaces and newline characters
+                char *start = token;
+                while (*start == ' ' || *start == '\n')
+                    start++;
+                char *end = start + strlen(start) - 1;
+                while (end > start && (*end == ' ' || *end == '\n'))
+                    end--;
+                *(end + 1) = '\0';
 
-                (*columns_name)[i - start_pos] = strdup(token);
+                (*columns_name)[i - start_pos] = strdup(start);
             }
             token = strtok(NULL, ",");
         }
@@ -215,4 +221,16 @@ int max(int *array, int size) {
             max = array[i] > max ? array[i] : max;
     }
     return max;
+}
+
+// Function to calculate visual length of a string
+unsigned calculate_visual_length(const char *str) {
+    unsigned length = 0;
+    while (*str) {
+        if ((*str & 0xC0) != 0x80) { // Count non-continuation bytes
+            length++;
+        }
+        str++;
+    }
+    return length;
 }

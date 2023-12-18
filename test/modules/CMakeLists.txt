@@ -14,4 +14,4 @@ add_executable(modules_tests ${TEST_SRC})
 target_link_libraries(modules_tests PRIVATE modules)
 
 # Add tests to CTest
-add_test(NAME ModulesTests COMMAND modules_tests "/Users/daoudlamalmi/Documents/voting_methods/votes/VoteCondorcet.csv" 10)
+add_test(NAME ModulesTests COMMAND modules_tests "/home/daoudlamalmi/Documents/voting_methods/votes/VoteCondorcet.csv" 10)
