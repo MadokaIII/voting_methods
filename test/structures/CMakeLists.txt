@@ -14,4 +14,4 @@ add_executable(structures_tests ${TEST_SRC} test_structure.h)
 target_link_libraries(structures_tests PRIVATE structures)
 
 # Add tests to CTest
-add_test(NAME StructuresTests COMMAND structures_tests "/home/madokaiii/voting_methods/votes/VoteCondorcet.csv" 10)
+add_test(NAME StructuresTests COMMAND structures_tests "/Users/daoudlamalmi/Documents/voting_methods/votes/VoteCondorcet.csv" 10)

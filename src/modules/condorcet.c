@@ -7,33 +7,23 @@
 /*-----------------------------------------------------------------*/
 
 #include "matrix.h"
-#include <stdlib.h>
+#include "stdbool.h"
 
 /*-----------------------------------------------------------------*/
 
-bool condorcet_winner(char *csv, int nb_candidates, Matrix *duel, int *winner) {
-    *winner = -1;
-    duel = init_matrix(true);
-    set_duel_from_file(duel, csv, nb_candidates);
-    int *results = calloc(nb_candidates, sizeof(int));
-    for (int i = 0; i < nb_candidates; i++) {
-        for (int j = 0; j < nb_candidates; j++) {
-            if (i != j) {
-                if (duel->data[i][j] > duel->data[j][i]) {
-                    results[i]++;
-                }
+bool find_condorcet_winner(ptrMatrix matrix, int numCandidates, int *winner) {
+    for (int i = 0; i < numCandidates; i++) {
+        bool isWinner = true;
+        for (int j = 0; j < numCandidates; j++) {
+            if (i != j && matrix->data[i][j] <= matrix->data[j][i]) {
+                isWinner = false;
+                break;
             }
         }
-    }
-    for (int i = 0; i < nb_candidates; i++) {
-        if (results[i] == nb_candidates - 1) {
+        if (isWinner) {
             *winner = i;
-            break;
+            return true;
         }
     }
-    free(results);
-    if (*winner == -1) {
-        return false;
-    }
-    return true;
+    return false;
 }

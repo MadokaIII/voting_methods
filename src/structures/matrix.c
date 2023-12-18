@@ -56,7 +56,10 @@ void set_matrix_from_file(ptrMatrix matrix, char *filename, int nb_candidates) {
 int duel_matrix(ptrMatrix ballot, int first, int second, int nb_candidates) {
     int score = 0;
     for (uint i = 0; i < ballot->rows; i++) {
-        score += has_better_score(first, second, nb_candidates) ? 1 : 0;
+        score += has_better_score(ballot->data[i][first],
+                                  ballot->data[i][second], nb_candidates)
+                     ? 1
+                     : 0;
     }
     return score;
 }
@@ -64,10 +67,11 @@ int duel_matrix(ptrMatrix ballot, int first, int second, int nb_candidates) {
 void set_duel_from_file(ptrMatrix duel, char *filename, int nb_candidates) {
     if (filename == NULL || nb_candidates <= 0)
         return;
-    Matrix *ballot = init_matrix(false);
+    ptrMatrix ballot = init_matrix(false);
     set_matrix_from_file(ballot, filename, nb_candidates);
     for (int i = 0; i < nb_candidates; i++) {
-        memcpy(&duel->tags[i], &ballot->tags[i], sizeof(StringBuffer));
+        duel->tags[i] =
+            init_stringbuffer(ballot->tags[i]->string, ballot->tags[i]->size);
         for (int j = 0; j < nb_candidates; j++) {
             if (i == j) {
                 duel->data[i][j] = 0;
@@ -77,9 +81,7 @@ void set_duel_from_file(ptrMatrix duel, char *filename, int nb_candidates) {
         }
     }
     duel->rows = duel->columns = nb_candidates;
-    for (uint i = 0; i < ballot->columns; i++) {
-        delete_stringbuffer(ballot->tags[i]);
-    }
+    delete_matrix(ballot);
 }
 
 void add_row(ptrMatrix matrix, int row[], uint size) {
@@ -135,6 +137,9 @@ void print_matrix(ptrMatrix matrix, const char *separator) {
     if (matrix == NULL || matrix->columns == 0 || matrix->rows == 0)
         return;
 
+    if (matrix->is_duel) {
+        printf("                         ");
+    }
     // Print column names with separators and spaces
     for (uint j = 0; j < matrix->columns; ++j) {
         print_stringbuffer(matrix->tags[j], STDOUT_AS_LIST, separator);
@@ -145,8 +150,8 @@ void print_matrix(ptrMatrix matrix, const char *separator) {
     // Print matrix data, center-aligned within the column width
     for (uint i = 0; i < matrix->rows; ++i) {
         if (matrix->is_duel) {
-            print_stringbuffer(matrix->tags[i], STDOUT_AS_LIST, separator);
-            printf("    ");
+            printf("%s%*s%s", separator, 19, matrix->tags[i]->string,
+                   separator);
         }
         for (uint j = 0; j < matrix->columns; ++j) {
             int numDigits = snprintf(NULL, 0, "%d", matrix->data[i][j]);

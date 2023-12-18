@@ -1,6 +1,7 @@
 #include "condorcet.h"
 #include "first_past_the_post.h"
 #include "matrix.h"
+#include "stringbuffer.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -28,19 +29,19 @@ int main(int argc, char **argv) {
     print_matrix(results, " | ");
 
     // Condorcet winner
-    delete_matrix(results);
-    results = init_matrix(true);
+    ptrMatrix matrix = init_matrix(true);
+    set_duel_from_file(matrix, argv[1], nb_candidates);
     int winner;
-    bool has_winner =
-        condorcet_winner(argv[1], nb_candidates, results, &winner);
-    if (has_winner) {
-        printf("\n\nCondorcet winner: %d\n", winner);
+    bool hasWinner = find_condorcet_winner(matrix, nb_candidates, &winner);
+    if (hasWinner) {
+        printf("Condorcet winner is candidate ");
+        print_stringbuffer(matrix->tags[winner], STDOUT, "");
+        fflush(stdout);
     } else {
-        printf("\n\nNo Condorcet winner.\n");
+        printf("No Condorcet winner found.\n");
     }
-    print_matrix(results, " | ");
-
+    print_matrix(matrix, " | ");
+    delete_matrix(matrix);
     delete_matrix(results);
-
     return EXIT_SUCCESS;
 }
