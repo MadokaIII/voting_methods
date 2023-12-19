@@ -48,56 +48,6 @@ void format_votes_with_filter(ptrMatrix matrix, int nb_candidates) {
     }
 }
 
-int *find_max_positions(const int *array, int size, int *resultSize) {
-    if (size == 0) {
-        *resultSize = 0;
-        return NULL;
-    }
-
-    int max = array[0];
-    int secondMax = 0;
-    int maxCount = 0;
-    int secondMaxCount = 0;
-
-    // First pass: Find max and second max values
-    for (int i = 0; i < size; i++) {
-        if (array[i] > max) {
-            secondMax = max;
-            secondMaxCount = maxCount;
-            max = array[i];
-            maxCount = 1;
-        } else if (array[i] == max) {
-            maxCount++;
-        } else if ((array[i] > secondMax && array[i] < max) || secondMax == 0) {
-            secondMax = array[i];
-            secondMaxCount = 1;
-        } else if (array[i] == secondMax) {
-            secondMaxCount++;
-        }
-    }
-
-    // Allocate result array
-    *resultSize = (maxCount > 1) ? maxCount : (maxCount + secondMaxCount);
-    int *result = (int *)calloc(*resultSize, sizeof(int));
-    if (!result) {
-        *resultSize = 0;
-        return NULL;
-    }
-
-    // Second pass: Store positions in result array
-    int index = 0;
-    for (int i = 0; i < size; i++) {
-        if ((maxCount == 1 && array[i] == secondMax) ||
-            (maxCount > 1 && array[i] == max)) {
-            if (index < *resultSize) {
-                result[index++] = i;
-            }
-        }
-    }
-
-    return result;
-}
-
 ptrMatrix first_past_the_post_one_round_results(char *csv_votes,
                                                 int nb_candidates) {
     // Initialize the matrix from the file
@@ -117,6 +67,9 @@ ptrMatrix first_past_the_post_one_round_results(char *csv_votes,
 
     // Calculate totals and add them as the last row
     add_totals_row(results);
+
+    // Add a new row for percentages
+    results->rows += 1;
 
     return results;
 }

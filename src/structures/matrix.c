@@ -147,10 +147,31 @@ void print_matrix(ptrMatrix matrix, const char *separator) {
         printf("%s%*s%s", separator, padding, "", separator);
     }
 
+    // Calculate the maximum width for each column
+    int *colWidths = (int *)malloc(matrix->columns * sizeof(int));
+    for (uint j = 0; j < matrix->columns; ++j) {
+        unsigned headerLength =
+            calculate_visual_length(matrix->tags[j]->string);
+        colWidths[j] = headerLength;
+        for (uint i = 0; i < matrix->rows; ++i) {
+            int numDigits = snprintf(NULL, 0, "%d", matrix->data[i][j]);
+            if (numDigits > colWidths[j]) {
+                colWidths[j] = numDigits;
+            }
+        }
+    }
+
     // Print column names with separators and spaces
     for (uint j = 0; j < matrix->columns; ++j) {
-        print_stringbuffer(matrix->tags[j], STDOUT_AS_LIST, separator);
-        printf("    ");
+        int headerLength = calculate_visual_length(matrix->tags[j]->string);
+        int colWidth = colWidths[j];
+        int leftPadding = floor((colWidth - headerLength) / 2.0);
+        int rightPadding = ceil((colWidth - headerLength) / 2.0);
+
+        // Print left padding, header, right padding, and separator
+        printf("%s%*s", separator, leftPadding, "");
+        print_stringbuffer(matrix->tags[j], STDOUT_AS_LIST, "");
+        printf("%*s%s", rightPadding, "", separator);
     }
     printf("\n");
 
@@ -159,25 +180,23 @@ void print_matrix(ptrMatrix matrix, const char *separator) {
         if (matrix->is_duel) {
             unsigned visualLength =
                 calculate_visual_length(matrix->tags[i]->string);
-            printf("%s%*s", separator, padding, matrix->tags[i]->string);
-            printf("%*s%s", visualLength - matrix->tags[i]->size, "",
-                   separator);
+            printf("%s%*s", separator, visualLength - matrix->tags[i]->size,
+                   "");
+            printf("%*s%s", padding, matrix->tags[i]->string, separator);
         }
         for (uint j = 0; j < matrix->columns; ++j) {
             int numDigits = snprintf(NULL, 0, "%d", matrix->data[i][j]);
-            unsigned visualLength =
-                calculate_visual_length(matrix->tags[j]->string);
-            int colWidth = visualLength;
+            int colWidth = colWidths[j];
             int leftPadding = floor((colWidth - numDigits) / 2.0);
             int rightPadding = ceil((colWidth - numDigits) / 2.0);
 
-            // Print left padding, data, and right padding
+            // Print left padding, data, right padding, and separator
             printf("%s%*s%d%*s%s", separator, leftPadding, "",
                    matrix->data[i][j], rightPadding, "", separator);
-            printf("    ");
         }
         printf("\n");
     }
+    free(colWidths);
 }
 
 void clear_matrix(ptrMatrix matrix) {

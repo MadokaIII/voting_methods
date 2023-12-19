@@ -15,4 +15,11 @@
 
 bool find_condorcet_winner(ptrMatrix matrix, int numCandidates, int *winner);
 
+int find_minimax_condorcet_winner(ptrMatrix duel, int nb_candidates);
+
+CandidateScore *find_ranked_pairs_condorcet_winner(ptrMatrix duel,
+                                                   int nb_candidates);
+
+int find_schulze_condorcet_winner(ptrMatrix duel, int nb_candidates);
+
 #endif // CONDORCET_H

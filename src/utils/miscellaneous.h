@@ -10,8 +10,16 @@
 #define MISCELLANEOUS_H
 
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
+
+/*-----------------------------------------------------------------*/
+
+typedef struct {
+    int candidate;
+    int score;
+} CandidateScore;
+
+enum Method { UNI1, UNI2, CM, CP, CS, JM, ALL, UNKNOWN };
 
 /*-----------------------------------------------------------------*/
 
@@ -108,24 +116,6 @@ void generate_random_string(char *str, int length);
  * @{
  * Fetching data into csv files.
  */
-
-/**
- * @brief Checks if the provided token represents a valid data column.
- *
- * This function compares the token against a dynamically generated set of valid
- * data column identifiers. The range of valid identifiers is from "-1" to the
- * value of `num_candidates`. It is used to determine whether a token in a CSV
- * file represents a data column. The inclusion of `num_candidates` allows
- * flexibility in the range of valid identifiers, adapting to different contexts
- * where the number of candidates (or categories) may vary.
- *
- * @param[in] token The string token to check.
- * @param[in] num_candidates The maximum number of valid data column
- *                           identifiers, indicating the upper bound of the
- *                           range starting from 0.
- * @return true if the token is a valid data column identifier, false otherwise.
- */
-bool is_data_column(const char *token, int num_candidates);
 
 /**
  * @brief Determines the starting position of data columns in a CSV file.
@@ -298,6 +288,8 @@ bool has_better_score(int first, int second, int max);
 int max(int *array, int size);
 
 unsigned calculate_visual_length(const char *str);
+
+enum Method str_to_enum(const char *method);
 
 /** @} */ // End of Miscellaneous group
 

@@ -13,7 +13,6 @@
 
 #include "miscellaneous.h"
 #include <ctype.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,64 +32,56 @@ void generate_random_string(char *str, int length) {
     str[length - 1] = '\0';
 }
 
-bool is_data_column(const char *token, int num_candidates) {
-    // Handle special case for "-1"
-    if (strcmp(token, "-1") == 0) {
-        return true;
-    }
-
-    // Check if token is within 0 to num_candidates
-    char buffer[20]; // Buffer for string conversion
-    for (int i = 0; i <= num_candidates; i++) {
-        sprintf(buffer, "%d", i); // Convert integer to string
-        if (strcmp(token, buffer) == 0) {
-            return true;
-        }
-    }
-    return false;
-}
-
 int get_start_pos(FILE *file, int nb_candidates) {
     char line[1024];
-    int start_pos = -1;
 
-    // Skip the first line (header)
+    // Read the first line (header)
     if (!fgets(line, sizeof(line), file)) {
         return -1; // Error or empty file
     }
 
-    // Read the second line
-    if (fgets(line, sizeof(line), file)) {
-        char *token = strtok(line, ",");
-        int colIndex = 0;
-        while (token != NULL) {
-            if (is_data_column(token, nb_candidates)) {
-                if (start_pos != -1)
-                    break;
-                else
-                    start_pos = colIndex;
-            }
-
-            colIndex++;
-            token = strtok(NULL, ",");
-        }
+    // Count total number of columns
+    int total_cols = 0;
+    char *token = strtok(line, ",");
+    while (token != NULL) {
+        total_cols++;
+        token = strtok(NULL, ",");
     }
 
-    fseek(file, 0, SEEK_SET);
+    // The start position of the data is the total number of columns minus
+    // nb_candidates
+    int start_pos = total_cols - nb_candidates;
+
     return start_pos;
 }
 
 bool is_special_format(const char *token) {
-    // Check for "Q00_Vote->" at the beginning
-    if (strncmp(token, "Q00_Vote->", 10) == 0) {
-        int i = 10; // Start checking after "Q00_Vote->"
-
-        // Check if there are one or more digits followed by " - "
-        while (isdigit(token[i]))
-            i++;
-        return strncmp(&token[i], " - ", 3) == 0;
+    // Check for "Q" at the beginning
+    if (token[0] != 'Q') {
+        return false;
     }
-    return false;
+
+    int i = 1; // Start checking after "Q"
+
+    // Check if there are one or more digits followed by "->" or "_Vote->"
+    while (isdigit(token[i])) {
+        i++;
+    }
+
+    if (strncmp(&token[i], "->", 2) == 0) {
+        i += 2; // Start checking after "->"
+    } else if (strncmp(&token[i], "_Vote->", 7) == 0) {
+        i += 7; // Start checking after "_Vote->"
+    } else {
+        return false;
+    }
+
+    // Check if there are one or more digits followed by " - "
+    while (isdigit(token[i])) {
+        i++;
+    }
+
+    return strncmp(&token[i], " - ", 3) == 0;
 }
 
 void get_column_names(FILE *file, char ***columns_name, int *cols,
@@ -233,4 +224,22 @@ unsigned calculate_visual_length(const char *str) {
         str++;
     }
     return length;
+}
+
+enum Method str_to_enum(const char *method) {
+    if (strcmp(method, "uni1") == 0)
+        return UNI1;
+    if (strcmp(method, "uni2") == 0)
+        return UNI2;
+    if (strcmp(method, "cm") == 0)
+        return CM;
+    if (strcmp(method, "cp") == 0)
+        return CP;
+    if (strcmp(method, "cs") == 0)
+        return CS;
+    if (strcmp(method, "jm") == 0)
+        return JM;
+    if (strcmp(method, "all") == 0)
+        return ALL;
+    return UNKNOWN;
 }
