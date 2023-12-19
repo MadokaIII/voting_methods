@@ -21,3 +21,4 @@ make
 # Create bin directory if it doesn't exist and move the binary to bin/
 mkdir -p ../bin
 mv ./src/VotingMethods ../bin/
+mv ./verify_my_vote/verify_my_vote ../bin/
